@@ -1,3 +1,5 @@
+# STARTED FROM Shttps://github.com/lukasheinrich/pylhe
+
 import os
 
 class LHEFile(object):
