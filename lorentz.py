@@ -43,6 +43,10 @@ class LorentzVector(object):
     def theta(self):
         return math.acos(self.pz / math.sqrt(self.px**2 + self.py**2 + self.pz**2 ) )
 
+    @property
+    def beta_scalar(self):
+        return  math.sqrt(self.px**2 + self.py**2 + self.pz**2 )/self.e
+
     def cosTheta(self):
         return math.cos(self.theta)
 
