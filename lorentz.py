@@ -18,6 +18,10 @@ class LorentzVector(object):
         self._pz = pz
         self._e = e
 
+    def __add__(lhs,rhs):
+        return LorentzVector(*[sum(x) for x in zip(lhs.components(),rhs.components())])
+
+
     def components(self):
         return (self.px,self.py,self.pz,self.e)
 
@@ -47,9 +51,14 @@ class LorentzVector(object):
     def beta_scalar(self):
         return  math.sqrt(self.px**2 + self.py**2 + self.pz**2 )/self.e
 
+    def mass(self):
+        return  math.sqrt(self.e**2 - ( self.px**2 + self.py**2 + self.pz**2) )
+
     def cosTheta(self):
         return math.cos(self.theta)
-
+    def energy(self):
+        energy_comp = self.components()[3]
+        return energy_comp
     def perp2(self):
         transvers_comps = self.components()[0:1]
         return contract_tuples(transvers_comps,transvers_comps)
