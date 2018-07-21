@@ -12,7 +12,7 @@ class LorentzVector(object):
     """
     A class for Lorentz four-vectors stuff
     """
-    def __init__(self,px,py,pz,e):
+    def __init__(self,px=0,py=0,pz=0,e=0):
         self._px = px
         self._py = py
         self._pz = pz
