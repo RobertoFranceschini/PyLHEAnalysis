@@ -1,6 +1,7 @@
 # with contributions from https://github.com/lukasheinrich/lorentz/blob/master/lorentz/
 
-import math
+import math, sys
+import numpy as np
 
 METRIC = [-1,-1,-1,1]
 
@@ -21,9 +22,23 @@ class LorentzVector(object):
     def __add__(lhs,rhs):
         return LorentzVector(*[sum(x) for x in zip(lhs.components(),rhs.components())])
 
+    def assign(self,px=0,py=0,pz=0,e=0):
+        self._px = px
+        self._py = py
+        self._pz = pz
+        self._e = e
+
 
     def components(self):
         return (self.px,self.py,self.pz,self.e)
+    def print_fv(self):
+        print(self.px,self.py,self.pz,self.e)
+
+    def emptyQ(self):
+        if  self.px==0 and self.py==0 and self.pz==0 and self.e==0:
+            return True
+        else:
+            return False
 
     # https://www.programiz.com/python-programming/property
 
@@ -40,27 +55,45 @@ class LorentzVector(object):
     def e(self):
         return self._e
 
+    # FUNCTIONS
+
+    def eta(self):
+        if abs(self.perp()) < sys.float_info.epsilon:
+            return float('inf') if self.pz >=0 else float('-inf')
+        return -np.log(np.tan(self.theta()/2.))
+
+
+    def rapidity(self):
+        return 0.5*np.log( (self.e + self.pz)/(self.e - self.pz)  )
+
     # @property
     # def theta_from_pT(self):
-    #     return math.atan2(self.perp(), self.e)
-    @property
-    def theta(self):
-        return math.acos(self.pz / math.sqrt(self.px**2 + self.py**2 + self.pz**2 ) )
+    #     return np.arctan2(self.perp(), self.e)
 
-    @property
+    def theta(self):
+        return np.arccos(self.pz / np.sqrt(self.px**2 + self.py**2 + self.pz**2 ) )
+
+
     def beta_scalar(self):
-        return  math.sqrt(self.px**2 + self.py**2 + self.pz**2 )/self.e
+        return  np.sqrt(self.px**2 + self.py**2 + self.pz**2 )/self.e
+
+    def gamma(self):
+        return  self.e/np.sqrt(self.e**2 - (self.px**2 + self.py**2 + self.pz**2) )
+
+    def betagamma(self):
+        return  np.sqrt(self.px**2 + self.py**2 + self.pz**2 )/np.sqrt(self.e**2 - (self.px**2 + self.py**2 + self.pz**2) )
 
     def mass(self):
-        return  math.sqrt(self.e**2 - ( self.px**2 + self.py**2 + self.pz**2) )
+        return  np.sqrt(self.e**2 - ( self.px**2 + self.py**2 + self.pz**2) )
+
+    def mom(self):
+        return  np.sqrt( ( self.px**2 + self.py**2 + self.pz**2) )
 
     def cosTheta(self):
-        return math.cos(self.theta)
+        return np.cos(self.theta())
+
     def energy(self):
-        energy_comp = self.components()[3]
-        return energy_comp
-    def perp2(self):
-        transvers_comps = self.components()[0:1]
-        return contract_tuples(transvers_comps,transvers_comps)
+        return self.e
+
     def perp(self):
-        return math.sqrt(self.perp2())
+        return  np.sqrt( ( self.px**2 + self.py**2  ) )
