@@ -1,6 +1,7 @@
 # STARTED FROM Shttps://github.com/lukasheinrich/pylhe
 
 import os
+from copy import copy, deepcopy
 
 class LHEFile(object):
     def __init__(self):

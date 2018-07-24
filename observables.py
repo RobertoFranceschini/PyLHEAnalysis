@@ -1,8 +1,8 @@
 #should be observable.py
-import lorentz
+import lorentz, lhef
 import numpy as np
 
-def make_obs_pair(obs,event=event,values=mUU_values,pidA=1,pidB=-1,statusA=1,statusB=1,flatten=False,return_value=True,default=None,ran=[]):
+def make_obs_pair(obs,event=None,values=None,pidA=1,pidB=-1,statusA=1,statusB=1,flatten=False,return_value=True,default=None,ran=[]):
     """
     Compute the observable *obs* write the result in is *mUU_values* from a pair made of one PIDA and one PIDB
     Assumes only one pair in the event exists!
@@ -24,8 +24,8 @@ def make_obs_pair(obs,event=event,values=mUU_values,pidA=1,pidB=-1,statusA=1,sta
     mUU=default
     for p in event.particles: # loop on the particles of each event
         #print(p.id)
-        get_lv(p,destination=lvA,status=statusA,pid=pidA)#,ran[2:4])
-        get_lv(p,destination=lvB,status=statusB,pid=pidB)#,ran[2:4])
+        lhef.get_lv(p,destination=lvA,status=statusA,pid=pidA)#,ran[2:4])
+        lhef.get_lv(p,destination=lvB,status=statusB,pid=pidB)#,ran[2:4])
 
 
 
