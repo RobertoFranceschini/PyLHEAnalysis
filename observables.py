@@ -1,6 +1,8 @@
 #should be observable.py
 import lorentz, lhef
 import numpy as np
+import pandas as pd
+
 
 def make_obs_pair(obs,event=None,values=None,pidA=1,pidB=-1,statusA=1,statusB=1,flatten=False,return_value=True,default=None,ran=[]):
     """
@@ -10,13 +12,18 @@ def make_obs_pair(obs,event=None,values=None,pidA=1,pidB=-1,statusA=1,statusB=1,
     Args:
         obs: callable
         ran: 4-elements list of random numbers
+        values: either a DataFrame to which I add rows. Each row has the structur index, n_event, value, weight for each value in the event calculation or a dictionary
 
     Returns:
-        float result of the computation
+        dictionary(values,weight)
+            values: float result of the computation
+            weight: weight of the event
 
     Raises:
         KeyError: Raises an exception.
     """
+
+    weight=event.eventinfo.weight
 
     lvA=lorentz.LorentzVector() # init four vector
     lvB=lorentz.LorentzVector() # init four vector
@@ -38,9 +45,18 @@ def make_obs_pair(obs,event=None,values=None,pidA=1,pidB=-1,statusA=1,statusB=1,
         else:
             mUU=obs(lvA,lvB) # obtain the deltaEtaAB
 
-    values.append(mUU) # append it to the vector of results, including when particles where not found
+    _result=[ {'values':val, 'weight':weight} for val in mUU ]
+    if type(values) is pd.core.frame.DataFrame:
+        for res in _result:# append it to the vector of results, including when particles where not found
+            values.loc[len(values)]=res
+    elif type(values) is list:
+        for res in _result:  # append it to the vector of results, including when particles where not found
+            values.append(res)
+    else:
+        print('values contained is not dict nor dataframe, cannot handle it')
+        return None
     if return_value==True:
-        return mUU
+        return _result
 
 
 def invariant_mass(fv,lv):

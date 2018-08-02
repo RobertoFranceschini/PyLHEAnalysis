@@ -125,7 +125,7 @@ def event_modifier_detector(e,rules,ran=[],inplace=False):
             p.pz = modified.pz
             p.e = modified.e
             lhe_modified=get_lv(p,status=1,pid=p.id)
-            #print("η'/η",lhe_modified.eta()/original.eta())
+            #print("eta'/eta",lhe_modified.eta()/original.eta())
         new_particles.append(p) # append the modified particle to the container
     modified_event.particles = new_particles # change the particles
     return modified_event
