@@ -44,19 +44,21 @@ def make_obs_pair(obs,event=None,values=None,pidA=1,pidB=-1,statusA=1,statusB=1,
             mUU=obs(lvAB) # obtain the mAB
         else:
             mUU=obs(lvA,lvB) # obtain the deltaEtaAB
-
-    _result=[ {'values':val, 'weight':weight} for val in mUU ]
-    if type(values) is pd.core.frame.DataFrame:
-        for res in _result:# append it to the vector of results, including when particles where not found
-            values.loc[len(values)]=res
-    elif type(values) is list:
-        for res in _result:  # append it to the vector of results, including when particles where not found
-            values.append(res)
-    else:
-        print('values contained is not dict nor dataframe, cannot handle it')
-        return None
-    if return_value==True:
-        return _result
+        if type(mUU) is np.float64:
+            _mUU=[mUU]
+            mUU=_mUU
+        _result=[ {'values':val, 'weight':weight} for val in mUU ]
+        if type(values) is pd.core.frame.DataFrame:
+            for res in _result:# append it to the vector of results, including when particles where not found
+                values.loc[len(values)]=res
+        elif type(values) is list:
+            for res in _result:  # append it to the vector of results, including when particles where not found
+                values.append(res)
+        else:
+            print('values contained is not dict nor dataframe, cannot handle it')
+            return None
+        if return_value==True:
+            return _result
 
 
 def invariant_mass(fv,lv):

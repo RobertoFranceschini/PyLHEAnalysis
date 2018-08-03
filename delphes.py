@@ -1,3 +1,5 @@
+# boostrap from https://github.com/uschnoor
+
 import ROOT
 from ROOT import  TLorentzVector
 import lhef
@@ -21,6 +23,6 @@ def branchToLHEparticles(branchDict,branch=None,id=None):
     muons=[]
     if branch != None and id !=None:
         for p in branchDict[branch]:
-            _muon=make_LHEparticle(p,id=id)
+            _muon=make_LHEparticle(p,id=int(id*p.Charge) )
             muons.append(_muon)
         return muons
