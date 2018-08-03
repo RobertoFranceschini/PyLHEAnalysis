@@ -18,11 +18,17 @@ def make_LHEparticle(p,id=None):
         print("id must be specified")
         pass
 
+def charged_pid(p,id):
+    if abs(id) in [11,13]:
+        return int(id*p.Charge)
+    else:
+        return int(id)
 
 def branchToLHEparticles(branchDict,branch=None,id=None):
     muons=[]
+
     if branch != None and id !=None:
         for p in branchDict[branch]:
-            _muon=make_LHEparticle(p,id=int(id*p.Charge) )
+            _muon=make_LHEparticle(p,id=charged_pid(p,id) )
             muons.append(_muon)
         return muons
