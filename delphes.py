@@ -8,7 +8,7 @@ import lhef
 def make_LHEparticle(p,id=None):
     if id != None:
         fv=TLorentzVector()
-        
+
         try:
             m=p.Mass
         except AttributeError:
@@ -62,3 +62,20 @@ def branchToLHEparticles(branchDict,branch=None,id=None):
             _muon=make_LHEparticle(p,id=charged_pid(p,id) )
             muons.append(_muon)
         return muons
+
+def ROOTfile2BranchDictTreeReader(inputfile = None): #delphesDir+'tautau.s.gt.2TeV.root'
+    ####### INIT THE BRANCHES #######
+    chain = ROOT.TChain("Delphes")
+    chain.Add(inputfile)
+    treereader = ROOT.ExRootTreeReader(chain)
+    branchDict = {}
+    branchDict["truthparticles"] = treereader.UseBranch("Particle")
+    branchDict["Event"] = treereader.UseBranch("Event")
+    branchDict["Electron"] = treereader.UseBranch("Electron")
+    branchDict["Muon"] = treereader.UseBranch("Muon")
+    branchDict["Photon"] = treereader.UseBranch("Photon")
+    branchDict["VLCjetR10N4"] = treereader.UseBranch("VLCjetR10N4")
+    branchDict["VLCjetR10N2"] = treereader.UseBranch("VLCjetR10N2")
+    branchDict["MissingET"] = treereader.UseBranch("MissingET")
+
+    return branchDict, treereader
