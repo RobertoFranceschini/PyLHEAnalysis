@@ -3,6 +3,7 @@
 import ROOT
 from ROOT import  TLorentzVector
 import lhef
+from copy import copy, deepcopy
 
 
 def make_LHEparticle(p,id=None):
@@ -43,24 +44,32 @@ def branchToLHEparticles(branchDict,branch=None,id=None):
     tautag = None
     btag = None
     if branch != None and id !=None:
+        # print('----------------')
         for p in branchDict[branch]:
+            final_pid=deepcopy(id)
+            #print('----')
             try:
+                #print('trying tau')
                 tautag=p.TauTag
-                id=15*int(p.Charge)
+                if tautag > 0:
+                    final_pid=15*int(p.Charge)
+                # print('was',tautag,'==>',final_pid)
             except AttributeError:
                 pass
             try:
+                # print('trying b')
                 btag=p.BTag
                 if btag >=4: #loose WP (90%))
-                    id=2
+                    final_pid=2
                 if btag in [2,3,6,7]: #medium WP
-                    id=3
+                    final_pid=3
                 if btag in [1,3,5,7]: #tight WP (50%eff)
-                    id=4
+                    final_pid=4
+                # print('was',btag,'==>',final_pid)
             except AttributeError:
                 pass
             #print(charged_pid(p,id))
-            _muon=make_LHEparticle(p,id=charged_pid(p,id) )
+            _muon=make_LHEparticle(p,id=charged_pid(p,final_pid) )
             muons.append(_muon)
         return muons
 

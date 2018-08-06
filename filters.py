@@ -51,7 +51,7 @@ def sorted_by_function(event=None, function=None, inplace=False, requested=None,
                 if strict == False:
                     pass
                 else:
-                    return []
+                    new_particles=[]
 
         modified_event.particles =  new_particles
 
