@@ -70,7 +70,7 @@ def ROOTfile2BranchDictTreeReader(inputfile = None, branches=None): #delphesDir+
         chain.Add(inputfile)
         treereader = ROOT.ExRootTreeReader(chain)
         branchDict = {}
-        for name in branches: 
+        for name in branches:
             branchDict[name] = treereader.UseBranch(name)
         #branchDict["Particle"] = treereader.UseBranch("Particle")
         #branchDict["Event"] = treereader.UseBranch("Event")
@@ -83,25 +83,31 @@ def ROOTfile2BranchDictTreeReader(inputfile = None, branches=None): #delphesDir+
 
         return branchDict, treereader
 
-def Tree2LHE(treereader=None,branchDict=None,event=None):
-    if ( treereader is not None ) and ( branchDict is not None) and event >= 0:
+def Tree2LHE(treereader=None,branchDict=None,event=None,branchesIDdict=None):
+    if ( treereader is not None ) and ( branchDict is not None) and ( branchesIDdict is not None) and event >= 0:
         treereader.ReadEntry(event) # read from ROOT
+        particles=[]
 
         # read particles into LHE particles objects
-        electrons=branchToLHEparticles(branchDict,branch="Electron",id=11)
-        photons=branchToLHEparticles(branchDict,branch="Photon",id=22)
-        muons=branchToLHEparticles(branchDict,branch="Muon",id=13)
-        hadrons=branchToLHEparticles(branchDict,branch="VLCjetR10N2",id=1) # makes bjets, jets and had-tau
-        MTM=branchToLHEparticles(branchDict,branch="MissingET",id=0)
+        for _branch, _id in branchesIDdict.items():
+            _particles=branchToLHEparticles(branchDict,branch=_branch,id=_id)
+            particles=particles + _particles
+        np = len(particles)
+
+
+        #electrons=branchToLHEparticles(branchDict,branch="Electron",id=11)
+        #photons=branchToLHEparticles(branchDict,branch="Photon",id=22)
+        #muons=branchToLHEparticles(branchDict,branch="Muon",id=13)
+        #hadrons=branchToLHEparticles(branchDict,branch="VLCjetR10N2",id=1) # makes bjets, jets and had-tau
+        #MTM=branchToLHEparticles(branchDict,branch="MissingET",id=0)
 
         # make list of particles
-        np=len(muons)+len(photons)+len(electrons)+len(hadrons)+len(MTM)
-        particles=[]
-        particles=particles+muons
-        particles=particles+electrons
-        particles=particles+photons
-        particles=particles+hadrons
-        particles=particles+MTM
+        #np=len(muons)+len(photons)+len(electrons)+len(hadrons)+len(MTM)
+        #particles=particles+muons
+        #particles=particles+electrons
+        #particles=particles+photons
+        #particles=particles+hadrons
+        #particles=particles+MTM
         #print(len(particles))
 
         # make LHE event container
