@@ -63,19 +63,51 @@ def branchToLHEparticles(branchDict,branch=None,id=None):
             muons.append(_muon)
         return muons
 
-def ROOTfile2BranchDictTreeReader(inputfile = None): #delphesDir+'tautau.s.gt.2TeV.root'
+def ROOTfile2BranchDictTreeReader(inputfile = None, branches=None): #delphesDir+'tautau.s.gt.2TeV.root'
     ####### INIT THE BRANCHES #######
-    chain = ROOT.TChain("Delphes")
-    chain.Add(inputfile)
-    treereader = ROOT.ExRootTreeReader(chain)
-    branchDict = {}
-    branchDict["truthparticles"] = treereader.UseBranch("Particle")
-    branchDict["Event"] = treereader.UseBranch("Event")
-    branchDict["Electron"] = treereader.UseBranch("Electron")
-    branchDict["Muon"] = treereader.UseBranch("Muon")
-    branchDict["Photon"] = treereader.UseBranch("Photon")
-    branchDict["VLCjetR10N4"] = treereader.UseBranch("VLCjetR10N4")
-    branchDict["VLCjetR10N2"] = treereader.UseBranch("VLCjetR10N2")
-    branchDict["MissingET"] = treereader.UseBranch("MissingET")
+    if branches is not None:
+        chain = ROOT.TChain("Delphes")
+        chain.Add(inputfile)
+        treereader = ROOT.ExRootTreeReader(chain)
+        branchDict = {}
+        for name in branches: 
+            branchDict[name] = treereader.UseBranch(name)
+        #branchDict["Particle"] = treereader.UseBranch("Particle")
+        #branchDict["Event"] = treereader.UseBranch("Event")
+        #branchDict["Electron"] = treereader.UseBranch("Electron")
+        #branchDict["Muon"] = treereader.UseBranch("Muon")
+        #branchDict["Photon"] = treereader.UseBranch("Photon")
+        #branchDict["VLCjetR10N4"] = treereader.UseBranch("VLCjetR10N4")
+        #branchDict["VLCjetR10N2"] = treereader.UseBranch("VLCjetR10N2")
+        #branchDict["MissingET"] = treereader.UseBranch("MissingET")
 
-    return branchDict, treereader
+        return branchDict, treereader
+
+def Tree2LHE(treereader=None,branchDict=None,event=None):
+    if ( treereader is not None ) and ( branchDict is not None) and event >= 0:
+        treereader.ReadEntry(event) # read from ROOT
+
+        # read particles into LHE particles objects
+        electrons=branchToLHEparticles(branchDict,branch="Electron",id=11)
+        photons=branchToLHEparticles(branchDict,branch="Photon",id=22)
+        muons=branchToLHEparticles(branchDict,branch="Muon",id=13)
+        hadrons=branchToLHEparticles(branchDict,branch="VLCjetR10N2",id=1) # makes bjets, jets and had-tau
+        MTM=branchToLHEparticles(branchDict,branch="MissingET",id=0)
+
+        # make list of particles
+        np=len(muons)+len(photons)+len(electrons)+len(hadrons)+len(MTM)
+        particles=[]
+        particles=particles+muons
+        particles=particles+electrons
+        particles=particles+photons
+        particles=particles+hadrons
+        particles=particles+MTM
+        #print(len(particles))
+
+        # make LHE event container
+        _event_info_dict={'nparticles':np, 'pid':0, 'weight':1.0, 'scale':0, 'aqed':0, 'aqcd':0}
+        lhe_info=lhef.LHEEventInfo(**_event_info_dict)
+        lhe_event=lhef.LHEEvent(lhe_info,particles)
+        return lhe_event
+    else:
+        print(treereader,branchDict,event,': all arguments are compulsory')
