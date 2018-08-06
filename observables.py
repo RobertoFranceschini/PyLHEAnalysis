@@ -3,6 +3,8 @@ import lorentz, lhef
 import numpy as np
 import pandas as pd
 
+#def count(obs,event=None,values=None,pidA=1,pidB=-1,statusA=1,statusB=1,flatten=False,return_value=True,default=None,ran=[]):
+
 
 def make_obs_pair(obs,event=None,values=None,pidA=1,pidB=-1,statusA=1,statusB=1,flatten=False,return_value=True,default=None,ran=[]):
     """
