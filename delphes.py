@@ -59,6 +59,7 @@ def branchToLHEparticles(branchDict,branch=None,id=None):
                     id=4
             except AttributeError:
                 pass
+            #print(charged_pid(p,id))
             _muon=make_LHEparticle(p,id=charged_pid(p,id) )
             muons.append(_muon)
         return muons

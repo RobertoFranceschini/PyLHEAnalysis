@@ -29,3 +29,30 @@ def filter_by_function(event=None, function=None, inplace=False):
         modified_event.particles =  new_particles
 
         return modified_event
+
+
+def sorted_by_function(event=None, function=None, inplace=False, requested=None, strict=True):
+    if (event is not None) and (requested is not None):
+        if inplace:
+            modified_event = event # reference to object, will affect the original
+        else:
+            modified_event = deepcopy(event) # clone the event
+
+
+        new_particles=[] # new particles to be put in the EVENT
+
+        value_particles = [ (function(p),p) for p in event.particles ]
+        sorted_value_particles = sorted(value_particles,reverse=True)
+
+        for ind in requested:
+            try:
+                new_particles.append(sorted_value_particles[ind][1] )
+            except IndexError:
+                if strict == False:
+                    pass
+                else:
+                    return []
+
+        modified_event.particles =  new_particles
+
+        return modified_event
