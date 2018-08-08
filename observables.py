@@ -5,7 +5,6 @@ import pandas as pd
 
 #def count(obs,event=None,values=None,pidA=1,pidB=-1,statusA=1,statusB=1,flatten=False,return_value=True,default=None,ran=[]):
 
-
 def make_obs_pair(obs,event=None,values=None,pidA=1,pidB=-1,statusA=1,statusB=1,flatten=False,return_value=True,default=None,ran=[]):
     """
     Compute the observable *obs* write the result in is *mUU_values* from a pair made of one PIDA and one PIDB
@@ -63,7 +62,7 @@ def make_obs_pair(obs,event=None,values=None,pidA=1,pidB=-1,statusA=1,statusB=1,
             return _result
 
 
-def invariant_mass(fv,lv):
+def invariant_mass_of2(fv,lv):
     return (fv +  lv).mass()
 def delta_eta(fv,lv):
     return np.fabs(fv.eta() -  lv.eta())
@@ -71,3 +70,10 @@ def delta_eta(fv,lv):
 
 def ThetaFromEta(eta):
     return 2.*np.arctan(np.exp(-eta))
+
+
+def invariant_mass(lv_list):
+    _lv = lorentz.LorentzVector()
+    for lv in lv_list:
+        _lv=lv+_lv
+    return _lv.mass()
