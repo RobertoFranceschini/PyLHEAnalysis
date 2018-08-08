@@ -3,7 +3,45 @@ import lorentz, lhef
 import numpy as np
 import pandas as pd
 
-#def count(obs,event=None,values=None,pidA=1,pidB=-1,statusA=1,statusB=1,flatten=False,return_value=True,default=None,ran=[]):
+
+def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None):
+    """
+    compute an *extensive* observable on a list of four-vectors, e.g. the invariant mass of the compound system made of the sum of all the four-vectors
+    the four vectors are those contained in a (filtered) LHE event, each event being an item of the input list list_of_LHEevents
+
+        obs: the observable. Must be a fuction of a LHE event (from which it reads the list of four-vectors)
+
+        list_of_LHEevents: list of LHE events. Each events contains the list of particles on which to compute the observavble
+
+        operation: how to merge the particles contained in each events, e.g. {a,b} , {c,d} |-> {ac,ad,bc,bd}
+
+    """
+    if (output is not None) and (operation is not None):
+        mixed_events  = operation(list_of_LHEevents)
+        computed_obs_values = [ obs(ev.particles) for ev in mixed_events ]
+        try:
+            weight=mixed_events[0].eventinfo.weight
+        except IndexError:
+            pass
+        [ output.append( {'values':val, 'weight':weight}  ) for val in computed_obs_values ]
+
+
+def invariant_mass_of2(fv,lv):
+    return (fv +  lv).mass()
+def delta_eta(fv,lv):
+    return np.fabs(fv.eta() -  lv.eta())
+
+
+def ThetaFromEta(eta):
+    return 2.*np.arctan(np.exp(-eta))
+
+
+def invariant_mass(lhe_event):
+    _lv = lorentz.LorentzVector()
+    for lv in lhe_event:
+        _lv=lv.fourvector()+_lv
+    return _lv.mass()
+
 
 def make_obs_pair(obs,event=None,values=None,pidA=1,pidB=-1,statusA=1,statusB=1,flatten=False,return_value=True,default=None,ran=[]):
     """
@@ -60,20 +98,3 @@ def make_obs_pair(obs,event=None,values=None,pidA=1,pidB=-1,statusA=1,statusB=1,
             return None
         if return_value==True:
             return _result
-
-
-def invariant_mass_of2(fv,lv):
-    return (fv +  lv).mass()
-def delta_eta(fv,lv):
-    return np.fabs(fv.eta() -  lv.eta())
-
-
-def ThetaFromEta(eta):
-    return 2.*np.arctan(np.exp(-eta))
-
-
-def invariant_mass(lhe_event):
-    _lv = lorentz.LorentzVector()
-    for lv in lhe_event:
-        _lv=lv.fourvector()+_lv
-    return _lv.mass()
