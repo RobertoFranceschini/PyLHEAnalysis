@@ -1,6 +1,6 @@
 # STARTED FROM Shttps://github.com/lukasheinrich/pylhe
 
-import os
+import os, utils
 from copy import copy, deepcopy
 
 class LHEFile(object):
@@ -129,3 +129,22 @@ def event_modifier_detector(e,rules,ran=[],inplace=False):
         new_particles.append(p) # append the modified particle to the container
     modified_event.particles = new_particles # change the particles
     return modified_event
+
+def outerLHEevents(list_of_LHEevents): # list of LHEevents usually made of filtered particles
+    def _testij(i,j):
+        if len(list_of_LHEevents) == 2:
+            return True
+        elif j > i:
+            return True
+        else:
+            False
+
+    muons=list_of_LHEevents[0]
+    muonsbar = muons
+
+    if len(list_of_LHEevents) == 2:
+        muonsbar = list_of_LHEevents[1]
+
+    _mat=[ [  LHEEvent(muons.eventinfo, [muons.particles[i], muonsbar.particles[j]])  for j in range(len(muonsbar.particles))  if _testij(i,j) ] for i in range(len(muons.particles)) ] # _mat is a matrix of LHEevents
+
+    return utils.flattenOnce(_mat) # this is a 1D list of LHEevents, same as the input, hence it can be made an iterative function if I need it to be
