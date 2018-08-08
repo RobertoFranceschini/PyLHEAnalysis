@@ -72,8 +72,8 @@ def ThetaFromEta(eta):
     return 2.*np.arctan(np.exp(-eta))
 
 
-def invariant_mass(lv_list):
+def invariant_mass(lhe_event):
     _lv = lorentz.LorentzVector()
-    for lv in lv_list:
-        _lv=lv+_lv
+    for lv in lhe_event:
+        _lv=lv.fourvector()+_lv
     return _lv.mass()
