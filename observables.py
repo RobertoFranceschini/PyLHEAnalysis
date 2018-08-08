@@ -26,6 +26,17 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None):
         [ output.append( {'values':val, 'weight':weight}  ) for val in computed_obs_values ]
 
 
+def values_of(Mmumu):
+    return pd.DataFrame(Mmumu)['values']
+def weights_of(Mmumu):
+    return pd.DataFrame(Mmumu)['weight']
+def v(x):
+    return values_of(x)
+def w(x):
+    return weights_of(x)
+
+
+
 def invariant_mass_of2(fv,lv):
     return (fv +  lv).mass()
 def delta_eta(fv,lv):
