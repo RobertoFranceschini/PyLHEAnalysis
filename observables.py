@@ -53,6 +53,12 @@ def ThetaFromEta(eta):
 ################################################################################
 ################################################################################
 
+def theta(lhe_event):
+    _lv = lorentz.LorentzVector()
+    for lv in lhe_event:
+        _lv=lv.fourvector()+_lv
+    return _lv.theta()
+
 def invariant_mass(lhe_event):
     _lv = lorentz.LorentzVector()
     for lv in lhe_event:
