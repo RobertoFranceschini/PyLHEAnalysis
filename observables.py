@@ -2,9 +2,11 @@
 import lorentz, lhef
 import numpy as np
 import pandas as pd
+import utils
 
 
-def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None):
+
+def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,return_value=False,check_value=None):
     """
     compute an *extensive* observable on a list of four-vectors, e.g. the invariant mass of the compound system made of the sum of all the four-vectors
     the four vectors are those contained in a (filtered) LHE event, each event being an item of the input list list_of_LHEevents
@@ -15,6 +17,8 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None):
 
         operation: how to merge the particles contained in each events, e.g. {a,b} , {c,d} |-> {ac,ad,bc,bd}
 
+        check_value: is a dictionary e.g. {'rel':bt,'threshold':[2,3]} with the type of check and the threshold to be used to which I add a new property for the current value and pass it to a tester that uses a dict variable input. example it must contain relation and threshold
+
     """
     if (output is not None) and (operation is not None):
         mixed_events  = operation(list_of_LHEevents)
@@ -23,7 +27,24 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None):
             weight=mixed_events[0].eventinfo.weight
         except IndexError:
             pass
-        [ output.append( {'values':val, 'weight':weight}  ) for val in computed_obs_values ]
+        try:
+            _nev=mixed_events[0].eventinfo.event_number
+        except IndexError:
+            pass
+        #[ output.append( {'values':val, 'weight':weight}  ) for val in computed_obs_values ]
+        _result = [  {'values':val, 'weight':weight, 'event_number':_nev }  for val in computed_obs_values ]
+
+        if type(output) is pd.core.frame.DataFrame:
+            for res in _result:# append it to the vector of results, including when particles where not found
+                output.loc[len(output)]=res
+        elif type(output) is list:
+            for res in _result:  # append it to the vector of results, including when particles where not found
+                output.append(res)
+
+        if check_value is not None:
+            _result = [ check_value({**_r,**check_value} ) for _r in _result ]
+        if return_value==True:
+            return _result
 
 
 def values_of(Mmumu):
