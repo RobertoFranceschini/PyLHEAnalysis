@@ -148,3 +148,11 @@ def outerLHEevents(list_of_LHEevents): # list of LHEevents usually made of filte
     _mat=[ [  LHEEvent(muons.eventinfo, [muons.particles[i], muonsbar.particles[j]])  for j in range(len(muonsbar.particles))  if _testij(i,j) ] for i in range(len(muons.particles)) ] # _mat is a matrix of LHEevents
 
     return utils.flattenOnce(_mat) # this is a 1D list of LHEevents, same as the input, hence it can be made an iterative function if I need it to be
+
+def splitterLHEevents(list_of_LHEevents): # list of LHEevents usually made of filtered particle
+
+    muons=list_of_LHEevents[0]
+
+    _mat=[ LHEEvent(muons.eventinfo, [muon])  for muon in muons.particles ] # _mat is a matrix of LHEevents
+
+    return _mat #utils.flattenOnce(_mat) # this is a 1D list of LHEevents, same as the input, hence it can be made an iterative function if I need it to be
