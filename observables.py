@@ -46,6 +46,12 @@ def delta_eta(fv,lv):
 def ThetaFromEta(eta):
     return 2.*np.arctan(np.exp(-eta))
 
+################################################################################
+################################################################################
+######################## FUCNTIONS OF LHE EVENTS ###############################
+################################################################################
+################################################################################
+################################################################################
 
 def invariant_mass(lhe_event):
     _lv = lorentz.LorentzVector()
@@ -53,6 +59,29 @@ def invariant_mass(lhe_event):
         _lv=lv.fourvector()+_lv
     return _lv.mass()
 
+def s_min(lhe_ev_vis,lhe_ev_inv):
+    """
+        lhe_ev_vis: is a LHE subevent containing all the particles to be considered as visible
+        lhe_ev_inv: is a LHE subevent containing the one particle for the missing momentum
+        in principle this observable depend on an external parameter, the mass of the invisible system
+        this is for now fixed at zero and can be made an optional argument. in that case a dictionary input needs to be implemented in compute_obs_estensively
+    """
+
+    SumMinv = 0
+    vis_sys=lorentz.LorentzVector()
+    for vis in lhe_ev_vis.particles:
+        vis_sys=vis_sys+vis.fourvector()
+
+    return np.sqrt( (vis_sys.energy())**2 - (vis_sys.pz)**2 ) + np.sqrt( (lhe_ev_inv.perp())**2 + (SumMinv)**2 )
+
+
+
+################################################################################
+################################################################################
+################################################################################
+################################################################################
+################################################################################
+################################################################################
 
 def make_obs_pair(obs,event=None,values=None,pidA=1,pidB=-1,statusA=1,statusB=1,flatten=False,return_value=True,default=None,ran=[]):
     """
