@@ -156,3 +156,7 @@ def splitterLHEevents(list_of_LHEevents): # list of LHEevents usually made of fi
     _mat=[ LHEEvent(muons.eventinfo, [muon])  for muon in muons.particles ] # _mat is a matrix of LHEevents
 
     return _mat #utils.flattenOnce(_mat) # this is a 1D list of LHEevents, same as the input, hence it can be made an iterative function if I need it to be
+
+
+def identiyLHEevents(list_of_LHEevents): # list of LHEevents usually made of filtered particle
+    return list_of_LHEevents
