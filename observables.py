@@ -3,6 +3,7 @@ import lorentz, lhef
 import numpy as np
 import pandas as pd
 import utils
+import HistogramContainer
 
 
 
@@ -40,6 +41,12 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,ret
         elif type(output) is list:
             for res in _result:  # append it to the vector of results, including when particles where not found
                 output.append(res)
+        elif type(output) is HistogramContainer.HistogramContainer:
+            for res in _result:
+                if check_value is not None:
+                    output.inclusive.append(res)
+                else:
+                    output.exclusive.append(res)
 
         if check_value is not None:
             _result = check_value['which']([ utils.test( {**_r,**check_value} ) for _r in _result ])
