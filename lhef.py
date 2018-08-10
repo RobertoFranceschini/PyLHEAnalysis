@@ -181,6 +181,26 @@ def splitterLHEevents(list_of_LHEevents): # list of LHEevents usually made of fi
 
     return _mat #utils.flattenOnce(_mat) # this is a 1D list of LHEevents, same as the input, hence it can be made an iterative function if I need it to be
 
+def mergeLHEevents(LHEevent): # list of LHEevents usually made of filtered particle
+
+    muons=deepcopy(LHEevent)
+
+    lv =lorentz.LorentzVector()
+    p=None
+    for muon in muons.particles:
+        p=muon
+        _lv=muon.fourvector()
+        lv=lv+_lv
+        p.px = lv.px
+        p.py = lv.py
+        p.pz = lv.pz
+        p.e = lv.e
+
+    muons.particles=[p]
+
+    _res = LHEEvent(muons.eventinfo, muons.particles)
+    return _res #utils.flattenOnce(_mat) # this is a 1D list of LHEevents, same as the input, hence it can be made an iterative function if I need it to be
+
 
 def identiyLHEevents(list_of_LHEevents): # list of LHEevents usually made of filtered particle
     return list_of_LHEevents
