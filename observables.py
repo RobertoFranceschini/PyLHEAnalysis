@@ -50,6 +50,7 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,ret
 
         if check_value is not None:
             _result = check_value['which']([ utils.test( {**_r,**check_value} ) for _r in _result ])
+            _result = _result*weight # 0 if _result was False, weight if results was True
         if return_value==True:
             return _result
 
