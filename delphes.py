@@ -22,7 +22,12 @@ def make_LHEparticle(p,id=None):
 
         fv.SetPtEtaPhiM(pT, p.Eta, p.Phi, m)
 
-        _dict={'id':id,'status':1,\
+        try:
+            status = p.status
+        except AttributeError:
+            status =1
+
+        _dict={'id':id,'status':status,\
                           'mother1':0,'mother2':0,'color1':0,'color2':0,\
                           'px':fv.Px(),'py':fv.Py(),'pz':fv.Pz(),'e':fv.Energy(),'m':fv.M(),'lifetime':0,'spin':0}
         lhepart=lhef.LHEParticle(**_dict)
