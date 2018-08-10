@@ -23,7 +23,7 @@ def make_LHEparticle(p,id=None):
         fv.SetPtEtaPhiM(pT, p.Eta, p.Phi, m)
 
         try:
-            status = p.status
+            status = p.Status
         except AttributeError:
             status =1
 
