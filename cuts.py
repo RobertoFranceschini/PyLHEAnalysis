@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import utils
 
 def cuts_efficiency_picture(cuts_matrix,begin=0,end=-1):

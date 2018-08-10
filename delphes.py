@@ -43,6 +43,14 @@ def branchToLHEparticles(branchDict,branch=None,id=None):
     muons=[]
     tautag = None
     btag = None
+
+    if branch == 'Particle' and id is None:
+        # None is used as flag to not alter the ID present in the branch
+        for p in branchDict[branch]:
+            _muon=make_LHEparticle(p,id=p.id )
+            muons.append(_muon)
+        return muons
+
     if branch != None and id !=None:
         # print('----------------')
         for p in branchDict[branch]:
