@@ -17,7 +17,7 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,ret
 
         operation: how to merge the particles contained in each events, e.g. {a,b} , {c,d} |-> {ac,ad,bc,bd}
 
-        check_value: is a dictionary e.g. {'relation':bt,'threshold':[2,3]} with the type of check and the threshold to be used to which I add a new property for the current value and pass it to a tester that uses a dict variable input. example it must contain relation and threshold
+        check_value: is a dictionary e.g. {'relation':bt,'threshold':[2,3],which:any} with the type of check and the threshold to be used to which I add a new property for the current value and pass it to a tester that uses a dict variable input. example it must contain relation and threshold
 
     """
     if (output is not None) and (operation is not None):
