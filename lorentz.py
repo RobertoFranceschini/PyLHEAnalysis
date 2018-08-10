@@ -73,6 +73,9 @@ class LorentzVector(object):
     def theta(self):
         return np.arccos(self.pz / np.sqrt(self.px**2 + self.py**2 + self.pz**2 ) )
 
+    def phi(self):
+        return np.arctan( self.py / self.px  )
+
 
     def beta_scalar(self):
         return  np.sqrt(self.px**2 + self.py**2 + self.pz**2 )/self.e
