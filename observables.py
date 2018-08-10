@@ -81,6 +81,13 @@ def ThetaFromEta(eta):
 ################################################################################
 ################################################################################
 
+def phi(lhe_event):
+    _lv = lorentz.LorentzVector()
+    for lv in lhe_event:
+        _lv=lv.fourvector()+_lv
+    return _lv.phi()
+
+
 def theta(lhe_event):
     _lv = lorentz.LorentzVector()
     for lv in lhe_event:
