@@ -15,7 +15,7 @@ def filter_by_pid(event=None, pids=[]):
         modified_event = lhef.LHEEvent(ev_info,new_particles)
         return modified_event
 
-def filter_by_function(event=None, function=None, inplace=False):
+def filter_by_function(event=None, function=None, inplace=False,stop_at=None):
     if event is not None:
         if inplace:
             modified_event = event # reference to object, will affect the original
@@ -25,9 +25,11 @@ def filter_by_function(event=None, function=None, inplace=False):
         for p in event.particles:
             if function(p):
                 new_particles.append(p)
+                if stop_at is not None:
+                    if len(new_particles)>stop_at:
+                        break
 
-        modified_event.particles =  new_particles
-
+        modified_event.particles = new_particles
         return modified_event
 
 
