@@ -100,6 +100,30 @@ def get_lv(p,destination=None,status=1,pid=-21,modifiers=[],ranlist=[]):
 
 
 
+def event_modifier_reverse_fourmomenta(e,inplace=False):
+    """
+    returns a modified LHE event
+
+    ran:
+        is either a list of variates.
+        If rnd is empty get_lv will make a random number,
+        otherwise is passed to the get_lv, which will pop elements out of it.
+    """
+    new_particles=[] # create container for the new
+    if inplace:
+        modified_event = e # reference to object, will affect the original
+    else:
+        modified_event = deepcopy(e) # clone the event
+    for p in modified_event.particles: # modify each particle one by one
+        p.px = -p.px
+        p.py = -p.py
+        p.pz = -p.pz
+        p.e = -p.e
+        new_particles.append(p) # append the modified particle to the container
+    modified_event.particles = new_particles # change the particles
+    return modified_event
+
+
 def event_modifier_detector(e,rules,ran=[],inplace=False):
     """
     returns a modified LHE event
