@@ -15,3 +15,7 @@ def cuts_efficiency_picture(cuts_matrix,begin=0,end=-1):
 def cuts_single_efficiency(cuts_matrix,begin=0,end=-1):
     _m=np.transpose(cuts_matrix[begin:end])
     return list(map(np.average,_m))
+
+def cuts_total_efficiency(cuts_matrix,begin=0,end=-1):
+    _m=cuts_matrix[begin:end]
+    return np.average(np.array(list(map(all,_m))))
