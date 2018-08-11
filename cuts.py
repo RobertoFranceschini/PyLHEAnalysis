@@ -23,4 +23,4 @@ def total_efficiency(cuts_matrix,begin=0,end=None):
 def one_step_efficiency(cuts_matrix):
     _m=np.transpose(cuts_matrix)
     _m_roll=np.roll(_m,-1,axis=0)
-    return np.append(np.array([cuts_single_efficiency(cuts_matrix)[0]]),np.array([ np.average( _m[i][_m[i]>0]*_m_roll[i][_m[i]>0] )  for i in range(len(_m)-1)  ]) )
+    return np.append(np.array([single_efficiencies(cuts_matrix)[0]]),np.array([ np.average( _m[i][_m[i]>0]*_m_roll[i][_m[i]>0] )  for i in range(len(_m)-1)  ]) )
