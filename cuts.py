@@ -10,3 +10,8 @@ def cuts_efficiency_picture(cuts_matrix,begin=0,end=-1):
     plt.imshow( cuts_info )
     plt.colorbar()
     plt.show()
+
+
+def cuts_single_efficiency(cuts_matrix,begin=0,end=-1):
+    _m=np.transpose(cuts_matrix[begin:end])
+    return list(map(np.average,_m))
