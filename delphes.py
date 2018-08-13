@@ -65,7 +65,7 @@ def branchToLHEparticles(branchDict,branch=None,id=None):
                 #print('trying tau')
                 tautag=p.TauTag
                 if tautag > 0:
-                    final_pid=15*int(p.Charge)
+                    final_pid=-15*int(p.Charge)
                 # print('was',tautag,'==>',final_pid)
             except AttributeError:
                 pass
