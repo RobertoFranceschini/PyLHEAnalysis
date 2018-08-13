@@ -101,6 +101,12 @@ def theta(lhe_event):
         _lv=lv.fourvector()+_lv
     return _lv.theta()
 
+def number(lhe_event):
+    res=0
+    for lv in lhe_event:
+        res=res+1
+    return res
+
 def perp(lhe_event):
     _lv = lorentz.LorentzVector()
     for lv in lhe_event:
