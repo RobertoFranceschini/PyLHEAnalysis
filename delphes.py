@@ -48,7 +48,8 @@ def branchToLHEparticles(branchDict,branch=None,id=None):
     muons=[]
     tautag = None
     btag = None
-
+    DEBUG=False
+    initial_pid =
     if branch == 'Particle' and id is None:
         # None is used as flag to not alter the ID present in the branch
         for p in branchDict[branch]:
@@ -57,31 +58,34 @@ def branchToLHEparticles(branchDict,branch=None,id=None):
         return muons
 
     if branch != None and id !=None:
-        # print('----------------')
+        if DEBUG: print(branch)
+        if DEBUG: print('----------------')
         for p in branchDict[branch]:
             final_pid=deepcopy(id)
-            #print('----')
+            initial_pid=deepcopy(id)
+
+            if DEBUG: print('----')
             try:
-                #print('trying tau')
+                if DEBUG: print('trying tau')
                 tautag=p.TauTag
                 if tautag > 0:
                     final_pid=-15*int(p.Charge)
-                # print('was',tautag,'==>',final_pid)
+                if DEBUG: print('tag was',tautag,'==> id:',final_pid)
             except AttributeError:
                 pass
             try:
-                # print('trying b')
+                if DEBUG: print('trying b')
                 btag=p.BTag
                 if btag >=4: #loose WP (90%))
-                    final_pid=2
+                    final_pid=initial_pid+1 # 2
                 if btag in [2,3,6,7]: #medium WP
-                    final_pid=3
+                    final_pid=initial_pid+2 # 3
                 if btag in [1,3,5,7]: #tight WP (50%eff)
-                    final_pid=4
-                # print('was',btag,'==>',final_pid)
+                    final_pid=initial_pid+3 # 4
+                if DEBUG: print('tag was',btag,'==> id:',final_pid)
             except AttributeError:
                 pass
-            #print(charged_pid(p,id))
+            if DEBUG: print('giving id', charged_pid(p,final_pid))
             _muon=make_LHEparticle(p,id=charged_pid(p,final_pid) )
             muons.append(_muon)
         return muons
