@@ -48,8 +48,7 @@ def branchToLHEparticles(branchDict,branch=None,id=None):
     muons=[]
     tautag = None
     btag = None
-    DEBUG=False
-    initial_pid =
+    DEBUG=True
     if branch == 'Particle' and id is None:
         # None is used as flag to not alter the ID present in the branch
         for p in branchDict[branch]:
