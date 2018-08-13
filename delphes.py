@@ -38,7 +38,7 @@ def make_LHEparticle(p,id=None):
 
 def charged_pid(p,id):
     if abs(id) in [11,13]:
-        return int(id*p.Charge)
+        return int(-id*p.Charge)
     else:
         return int(id)
 
