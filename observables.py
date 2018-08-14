@@ -32,8 +32,12 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,ret
             _nev=mixed_events[0].eventinfo.event_number
         except IndexError:
             pass
+        try:
+            _label=mixed_events[0].eventinfo.sample_label
+        except IndexError:
+            pass
         #[ output.append( {'values':val, 'weight':weight}  ) for val in computed_obs_values ]
-        _result = [  {'values':val, 'weight':weight, 'event_number':_nev }  for val in computed_obs_values ]
+        _result = [  {'values':val, 'weight':weight, 'event_number':_nev, 'sample_label':_label }  for val in computed_obs_values ]
 
         if type(output) is pd.core.frame.DataFrame:
             for res in _result:# append it to the vector of results, including when particles where not found
