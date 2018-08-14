@@ -114,6 +114,12 @@ def number(lhe_event):
         res=res+1
     return res
 
+def energy(lhe_event):
+    _lv = lorentz.LorentzVector()
+    for lv in lhe_event:
+        _lv=lv.fourvector()+_lv
+    return _lv.energy()
+
 def perp(lhe_event):
     _lv = lorentz.LorentzVector()
     for lv in lhe_event:
