@@ -42,11 +42,14 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,ret
             for res in _result:  # append it to the vector of results, including when particles where not found
                 output.append(res)
         elif type(output) is HistogramContainer.HistogramContainer:
+            #print('is a HistogramContainer.HistogramContainer')
             for res in _result:
                 if check_value is not None:
                     output.inclusive.append(res)
+                    #print(output.inclusive)
                 else:
                     output.exclusive.append(res)
+                    #print(output.exclusive)
 
         if check_value is not None:
             _result = check_value['which']([ utils.test( {**_r,**check_value} ) for _r in _result ])
