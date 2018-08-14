@@ -71,13 +71,7 @@ def v(x):
 def w(x):
     return weights_of(x)
 
-def concatenate_results(list_of_jsons=None,columns=None):
-    if columns is not None:
-        _w=pd.DataFrame( list_of_jsons[0] ).set_index('event_number')['weight']
-        _p=pd.concat(map(lambda x: pd.DataFrame(x).set_index('event_number')['values'], list_of_jsons ),axis=1, sort=False)
-        _p.columns = columns
-        _p=pd.concat([_p,_w],axis=1, sort=False)
-    return _p
+
 
 def invariant_mass_of2(fv,lv):
     return (fv +  lv).mass()
