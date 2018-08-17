@@ -1,4 +1,3 @@
-#should be observable.py
 import lorentz, lhef
 import numpy as np
 import pandas as pd
@@ -109,40 +108,40 @@ def ThetaFromEta(eta):
 ################################################################################
 ################################################################################
 
-def phi(lhe_event):
+def phi(lhe_particles):
     _lv = lorentz.LorentzVector()
-    for lv in lhe_event:
+    for lv in lhe_particles:
         _lv=lv.fourvector()+_lv
     return _lv.phi()
 
 
-def theta(lhe_event):
+def theta(lhe_particles):
     _lv = lorentz.LorentzVector()
-    for lv in lhe_event:
+    for lv in lhe_particles:
         _lv=lv.fourvector()+_lv
     return _lv.theta()
 
-def number(lhe_event):
+def number(lhe_particles):
     res=0
-    for lv in lhe_event:
+    for lv in lhe_particles:
         res=res+1
     return res
 
-def energy(lhe_event):
+def energy(lhe_particles):
     _lv = lorentz.LorentzVector()
-    for lv in lhe_event:
+    for lv in lhe_particles:
         _lv=lv.fourvector()+_lv
     return _lv.energy()
 
-def perp(lhe_event):
+def perp(lhe_particles):
     _lv = lorentz.LorentzVector()
-    for lv in lhe_event:
+    for lv in lhe_particles:
         _lv=lv.fourvector()+_lv
     return _lv.perp()
 
-def invariant_mass(lhe_event):
+def invariant_mass(lhe_particles):
     _lv = lorentz.LorentzVector()
-    for lv in lhe_event:
+    for lv in lhe_particles:
         _lv=lv.fourvector()+_lv
     return _lv.mass()
 

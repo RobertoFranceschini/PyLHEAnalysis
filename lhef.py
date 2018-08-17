@@ -236,9 +236,19 @@ def outerLHEevents(list_of_LHEevents): # list of LHEevents usually made of filte
         if DEBUG: print(list_of_LHEevents)
         return None # not enough or too many particles provided
 
+def acceptable_shape_at_least_N(list_of_LHEevents,nmin=0):
+    _accept=False
+    if (type(list_of_LHEevents) is list): # is a list of events
+        if len(list_of_LHEevents) > 0:
+            if (type(list_of_LHEevents[0].particles) is list):
+                if (len(list_of_LHEevents[0].particles) > nmin ):
+                    _accept=True
+    return _accept
+
+
 def splitterLHEevents(list_of_LHEevents): # list of LHEevents usually made of filtered particle
 
-    if type(list_of_LHEevents) is list:
+    if acceptable_shape_at_least_N(list_of_LHEevents,nmin=0):
         muons=list_of_LHEevents[0]
 
         _mat=[ LHEEvent(muons.eventinfo, [muon])  for muon in muons.particles ] # _mat is a matrix of LHEevents
@@ -271,4 +281,10 @@ def mergeLHEevents(LHEevent): # list of LHEevents usually made of filtered parti
         return None
 
 def identiyLHEevents(list_of_LHEevents): # list of LHEevents usually made of filtered particle
-    return list_of_LHEevents
+    """
+        does not check if the list contains events or not
+    """
+    if acceptable_shape_at_least_N(list_of_LHEevents,nmin=-1):
+        return list_of_LHEevents
+    else:
+        return None
