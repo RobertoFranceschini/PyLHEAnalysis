@@ -32,45 +32,47 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,ret
                     _ev.print_event()
 
             mixed_events  = operation(list_of_LHEevents)
-            print('mixed events', mixed_events, 'under ',str(operation))
-            computed_obs_values = [ obs(ev.particles) for ev in mixed_events ]
-            try:
-                weight=mixed_events[0].eventinfo.weight
-            except IndexError:
-                if DEBUG: print('weight not found!')
-                pass
-            try:
-                _nev=mixed_events[0].eventinfo.event_number
-            except IndexError:
-                pass
-            try:
-                _label=mixed_events[0].eventinfo.sample_label
-            except IndexError:
-                pass
-            #[ output.append( {'values':val, 'weight':weight}  ) for val in computed_obs_values ]
-            _result = [  {'values':val, 'weight':weight, 'event_number':_nev, 'sample_label':_label }  for val in computed_obs_values ]
+            if mixed_events is not None:
+                print('mixed events', mixed_events, 'under ',str(operation))
+                computed_obs_values = [ obs(ev.particles) for ev in mixed_events ]
+                try:
+                    weight=list_of_LHEevents[0].eventinfo.weight
+                except IndexError:
+                    if DEBUG: print('weight not found!')
+                    #_result = [  {'values':np.nan, 'weight':weight, 'event_number':_nev, 'sample_label':_label }  for val in computed_obs_values ]
+                    pass
+                try:
+                    _nev=list_of_LHEevents[0].eventinfo.event_number
+                except IndexError:
+                    pass
+                try:
+                    _label=list_of_LHEevents[0].eventinfo.sample_label
+                except IndexError:
+                    pass
+                #[ output.append( {'values':val, 'weight':weight}  ) for val in computed_obs_values ]
+                _result = [  {'values':val, 'weight':weight, 'event_number':_nev, 'sample_label':_label }  for val in computed_obs_values ]
 
-            if type(output) is pd.core.frame.DataFrame:
-                for res in _result:# append it to the vector of results, including when particles where not found
-                    output.loc[len(output)]=res
-            elif type(output) is list:
-                for res in _result:  # append it to the vector of results, including when particles where not found
-                    output.append(res)
-            elif type(output) is HistogramContainer.HistogramContainer:
-                #print('is a HistogramContainer.HistogramContainer')
-                for res in _result:
-                    if check_value is not None:
-                        output.inclusive.append(res)
-                        #print(output.inclusive)
-                    else:
-                        output.exclusive.append(res)
-                        #print(output.exclusive)
+                if type(output) is pd.core.frame.DataFrame:
+                    for res in _result:# append it to the vector of results, including when particles where not found
+                        output.loc[len(output)]=res
+                elif type(output) is list:
+                    for res in _result:  # append it to the vector of results, including when particles where not found
+                        output.append(res)
+                elif type(output) is HistogramContainer.HistogramContainer:
+                    #print('is a HistogramContainer.HistogramContainer')
+                    for res in _result:
+                        if check_value is not None:
+                            output.inclusive.append(res)
+                            #print(output.inclusive)
+                        else:
+                            output.exclusive.append(res)
+                            #print(output.exclusive)
 
-            if check_value is not None:
-                _result = check_value['which']([ utils.test( {**_r,**check_value} ) for _r in _result ])
-                _result = _result*weight # 0 if _result was False, weight if results was True
-            if return_value==True:
-                return _result
+                if check_value is not None:
+                    _result = check_value['which']([ utils.test( {**_r,**check_value} ) for _r in _result ])
+                    _result = _result*weight # 0 if _result was False, weight if results was True
+                if return_value==True:
+                    return _result
 
 
 def values_of(Mmumu):
