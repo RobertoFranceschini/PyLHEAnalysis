@@ -26,6 +26,10 @@ class AnalysisResult(object):
 
 
 def analysis_result_to_pandas(analysis_result=None, names=None):
-    _D=[analysis_result.histograms.list_of_histograms[name].exclusive for name in names ]
-    _pd_observables=concatenate_results(_D,columns=names)
+    _Dexclusive=[analysis_result.histograms.list_of_histograms[name].exclusive for name in names ]
+    _Dinclusive=[analysis_result.histograms.list_of_histograms[name].inclusive for name in names ]
+    _D=_Dexclusive+_Dinclusive
+    _names_inclusive = [ nam+'_inclusive' for nam in names ]
+    _names = names +_names_inclusive
+    _pd_observables=concatenate_results(_D,columns=_names)
     return _pd_observables
