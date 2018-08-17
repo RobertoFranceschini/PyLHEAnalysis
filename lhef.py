@@ -14,6 +14,25 @@ class LHEEvent(object):
         for p in self.particles:
             p.event = self
 
+    def __iter__(self):
+        for attr, value in self.__dict__.iteritems():
+            yield attr, value
+
+    def print_event(self):
+        print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+        try:
+            print('event number ', self.eventinfo.event_number)
+        except AttributeError:
+            print('no event number information')
+            pass
+        self.eventinfo.print_event_info()
+        print('-----------------------------------------------------------------')
+        for _p in self.particles:
+            print('**************')
+            _p.print_lhe_particle()
+
+
+
 class LHEEventInfo(object):
     fieldnames = ['nparticles', 'pid', 'weight', 'scale', 'aqed', 'aqcd']
     def __init__(self, **kwargs):
@@ -25,6 +44,18 @@ class LHEEventInfo(object):
     @classmethod
     def fromstring(cls,string):
         return cls(**dict(list(zip(cls.fieldnames,list(map(float,string.split()))))))
+
+    def print_event_info_general(self):
+        _attribs =  [a for a in dir(self) if not a.startswith('__')]
+        #print( _attribs  )
+        for __a in _attribs:
+            print( __a, getattr(self,__a) )
+
+    def print_event_info(self):
+        #_attribs =  [a for a in dir(self) if not a.startswith('__')]
+        #print( _attribs  )
+        for __a in self.fieldnames:
+            print( __a, getattr(self,__a) )
 
 
 import lorentz
@@ -42,6 +73,20 @@ class LHEParticle(object):
     def fromstring(cls,string):
         obj = cls(**dict(list(zip(cls.fieldnames,list(map(float,string.split()))))))
         return obj
+
+
+    def print_lhe_particle(self):
+        for __a in self.fieldnames:
+            print( __a, getattr(self,__a) )
+        import numpy as np
+        print('theta=',self.fourvector().theta() )
+        print('theta=',np.rad2deg(self.fourvector().theta()), 'deg' )
+
+    def print_lhe_particle_general(self):
+        _attribs =  [a for a in dir(self) if not a.startswith('__')]
+        print( _attribs  )
+        for __a in _attribs:
+            print( __a, getattr(self,__a) )
 
     def mothers(self):
         mothers = []
