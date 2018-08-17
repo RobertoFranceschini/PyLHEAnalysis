@@ -200,23 +200,27 @@ def event_modifier_detector(e,rules,ran=[],inplace=False):
     return modified_event
 
 def outerLHEevents(list_of_LHEevents): # list of LHEevents usually made of filtered particles
-    def _testij(i,j):
+
+    if ( len(list_of_LHEevents) == 1 and len(list_of_LHEevents[0])>1 ) or (len(list_of_LHEevents) == 2): # for now is only implemented what to do with two lists or one
+        def _testij(i,j):
+            if len(list_of_LHEevents) == 2:
+                return True
+            elif j > i:
+                return True
+            else:
+                False
+
+        muons=list_of_LHEevents[0]
+        muonsbar = muons
+
         if len(list_of_LHEevents) == 2:
-            return True
-        elif j > i:
-            return True
-        else:
-            False
+            muonsbar = list_of_LHEevents[1]
 
-    muons=list_of_LHEevents[0]
-    muonsbar = muons
+        _mat=[ [  LHEEvent(muons.eventinfo, [muons.particles[i], muonsbar.particles[j]])  for j in range(len(muonsbar.particles))  if _testij(i,j) ] for i in range(len(muons.particles)) ] # _mat is a matrix of LHEevents
 
-    if len(list_of_LHEevents) == 2:
-        muonsbar = list_of_LHEevents[1]
-
-    _mat=[ [  LHEEvent(muons.eventinfo, [muons.particles[i], muonsbar.particles[j]])  for j in range(len(muonsbar.particles))  if _testij(i,j) ] for i in range(len(muons.particles)) ] # _mat is a matrix of LHEevents
-
-    return utils.flattenOnce(_mat) # this is a 1D list of LHEevents, same as the input, hence it can be made an iterative function if I need it to be
+        return utils.flattenOnce(_mat) # this is a 1D list of LHEevents, same as the input, hence it can be made an iterative function if I need it to be
+    else:
+        return [] # not enough or too many particles provided
 
 def splitterLHEevents(list_of_LHEevents): # list of LHEevents usually made of filtered particle
 
