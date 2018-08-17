@@ -200,7 +200,7 @@ def event_modifier_detector(e,rules,ran=[],inplace=False):
     return modified_event
 
 def outerLHEevents(list_of_LHEevents): # list of LHEevents usually made of filtered particles
-
+    DEBUG=False
     def _testij(i,j):
         if len(list_of_LHEevents) == 2:
             return True
@@ -212,12 +212,12 @@ def outerLHEevents(list_of_LHEevents): # list of LHEevents usually made of filte
 
     def acceptable_shape(list_of_LHEevents):
         _accept=False
-        if (type(list_of_LHEevents) is list):
-            if (type(list_of_LHEevents[0]) is list):
-                if len(list_of_LHEevents) == 2:
+        if (type(list_of_LHEevents) is list): # is a list of events
+            if (type(list_of_LHEevents[0].particles) is list):
+                if len(list_of_LHEevents) == 2: # is a list containing two events
                     _accept=True
-                elif  len(list_of_LHEevents) == 1:
-                    if len(list_of_LHEevents[0])>1:
+                elif  len(list_of_LHEevents) == 1: # is a list containing one event
+                    if len(list_of_LHEevents[0].particles)>1: # and it has 2 or more particles
                         _accept=True
         return _accept
 
@@ -233,6 +233,7 @@ def outerLHEevents(list_of_LHEevents): # list of LHEevents usually made of filte
 
         return utils.flattenOnce(_mat) # this is a 1D list of LHEevents, same as the input, hence it can be made an iterative function if I need it to be
     else:
+        if DEBUG: print(list_of_LHEevents)
         return None # not enough or too many particles provided
 
 def splitterLHEevents(list_of_LHEevents): # list of LHEevents usually made of filtered particle

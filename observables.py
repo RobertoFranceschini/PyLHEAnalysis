@@ -22,10 +22,12 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,ret
 
     """
 
-    DEBUG=True
+    DEBUG=False
 
     #if len(list_of_LHEevents) > 0:
     if (output is not None) and (operation is not None):
+        if DEBUG: print('~~~~~~~~~~~~~~~~~~')
+        if DEBUG: print('computing',str(obs))
         if DEBUG: print('lenght of list of sub-events', len(list_of_LHEevents))
         if DEBUG:
             for _ev in list_of_LHEevents:
@@ -51,30 +53,31 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,ret
                 pass
             #[ output.append( {'values':val, 'weight':weight}  ) for val in computed_obs_values ]
             _result = [  {'values':val, 'weight':weight, 'event_number':_nev, 'sample_label':_label }  for val in computed_obs_values ]
-
-        else: #mixed events was None
-            #result should be None
-            _result = [  {'values':np.nan, 'weight':np.nan} ] #, 'weight':weight, 'event_number':_nev, 'sample_label':_label } ]
-
-            if type(output) is pd.core.frame.DataFrame:
-                for res in _result:# append it to the vector of results, including when particles where not found
-                    output.loc[len(output)]=res
-            elif type(output) is list:
-                for res in _result:  # append it to the vector of results, including when particles where not found
-                    output.append(res)
-            elif type(output) is HistogramContainer.HistogramContainer:
-                #print('is a HistogramContainer.HistogramContainer')
-                for res in _result:
-                    if check_value is not None:
-                        output.inclusive.append(res)
-                        #print(output.inclusive)
-                    else:
-                        output.exclusive.append(res)
-                        #print(output.exclusive)
+            if DEBUG: print(_result)
+        else: #mixed events was None, weight set to zero
+            if DEBUG: print('result should be NaN')
+            _result = [  {'values':np.nan, 'weight':0} ] #, 'weight':weight, 'event_number':_nev, 'sample_label':_label } ]
+            # np.nan gives always False when comapred to a number , all checks will fail
+        if type(output) is pd.core.frame.DataFrame:
+            for res in _result:# append it to the vector of results, including when particles where not found
+                output.loc[len(output)]=res
+        elif type(output) is list:
+            for res in _result:  # append it to the vector of results, including when particles where not found
+                output.append(res)
+        elif type(output) is HistogramContainer.HistogramContainer:
+            #print('is a HistogramContainer.HistogramContainer')
+            for res in _result:
+                if check_value is not None:
+                    output.inclusive.append(res)
+                    #print(output.inclusive)
+                else:
+                    output.exclusive.append(res)
+                    #print(output.exclusive)
 
         if check_value is not None: # it is a cut
-            __result = check_value['which']([ utils.test( {**_r,**check_value} ) for _r in _result ])
-            _result = __result*(_result[0]['weight'])  # 0 if _result was False; gives the weight if results was True
+            bool_result = check_value['which']([ utils.test( {**_r,**check_value} ) for _r in _result ])
+
+            _result = bool_result*(_result[0]['weight'])  # 0 if bool_result was False; gives the weight if results was True
         if return_value==True:
             return _result
 
