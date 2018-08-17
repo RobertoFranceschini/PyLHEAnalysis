@@ -54,7 +54,7 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,ret
 
         else: #mixed events was None
             #result should be None
-            _result = [  {'values':np.nan} ] #, 'weight':weight, 'event_number':_nev, 'sample_label':_label } ]
+            _result = [  {'values':np.nan, 'weight':np.nan} ] #, 'weight':weight, 'event_number':_nev, 'sample_label':_label } ]
 
             if type(output) is pd.core.frame.DataFrame:
                 for res in _result:# append it to the vector of results, including when particles where not found
@@ -73,8 +73,8 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,ret
                         #print(output.exclusive)
 
         if check_value is not None: # it is a cut
-            _result = check_value['which']([ utils.test( {**_r,**check_value} ) for _r in _result ])
-            _result = _result*weight # 0 if _result was False, weight if results was True
+            __result = check_value['which']([ utils.test( {**_r,**check_value} ) for _r in _result ])
+            _result = __result*(_result[0]['weight'])  # 0 if _result was False; gives the weight if results was True
         if return_value==True:
             return _result
 
