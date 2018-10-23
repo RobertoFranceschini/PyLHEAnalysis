@@ -22,6 +22,14 @@ class LorentzVector(object):
     def __add__(lhs,rhs):
         return LorentzVector(*[sum(x) for x in zip(lhs.components(),rhs.components())])
 
+    def __sub__(lhs,rhs):
+        return LorentzVector(*[sum(x) for x in zip(lhs.components(),-rhs.components())])
+
+    def __mul__(lhs,rhs):
+        return contract_tuples(lhs,rhs,metric = METRIC):
+
+
+
     def assign(self,px=0,py=0,pz=0,e=0):
         self._px = px
         self._py = py
@@ -88,6 +96,9 @@ class LorentzVector(object):
 
     def mass(self):
         return  np.sqrt(self.e**2 - ( self.px**2 + self.py**2 + self.pz**2) )
+
+    def signed_mass_squared(self):
+        return  np.sign(self.e**2 - ( self.px**2 + self.py**2 + self.pz**2) )  * np.sqrt(np.abs(self.e**2 - ( self.px**2 + self.py**2 + self.pz**2) ))
 
     def mom(self):
         return  np.sqrt( ( self.px**2 + self.py**2 + self.pz**2) )
