@@ -145,7 +145,7 @@ def invariant_mass(lhe_particles):
         _lv=lv.fourvector()+_lv
     return _lv.mass()
 
-def missing_invariant_mass(lhe_particles,com=3000):
+def missing_invariant_mass_fixed_com(lhe_particles,com=3000):
     _lv = lorentz.LorentzVector()
     for lv in lhe_particles:
         _lv=lv.fourvector()+_lv
@@ -155,6 +155,24 @@ def missing_invariant_mass(lhe_particles,com=3000):
     missing = initial_state + _lv #this relies on making the vector with e= - COM
 
     return missing.signed_mass_squared()
+
+def missing_invariant_mass(lhe_particles):
+
+    initial_particles = [ p for p in lhe_particles if p.status == -1 ]
+    final_particles = [ p for p in lhe_particles if p.status == 1 ]
+    i_lv = lorentz.LorentzVector()
+    f_lv = lorentz.LorentzVector()
+
+    for lv in final_particles:
+        f_lv=lv.fourvector()+f_lv
+    for lv in initial_particles:
+        i_lv=lv.fourvector()+i_lv
+
+    missing = i_lv - f_lv
+
+    return missing.signed_mass_squared()
+
+
 
 
 def s_min(lhe_ev_vis,lhe_ev_inv):
