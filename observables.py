@@ -145,6 +145,18 @@ def invariant_mass(lhe_particles):
         _lv=lv.fourvector()+_lv
     return _lv.mass()
 
+def missing_invariant_mass(lhe_particles,com=3000):
+    _lv = lorentz.LorentzVector()
+    for lv in lhe_particles:
+        _lv=lv.fourvector()+_lv
+
+    initial_state=lorentz.LorentzVector(px=0,py=0,pz=0,e=-com)
+
+    missing = initial_state + _lv #this relies on making the vector with e= - COM
+
+    return missing.signed_mass_squared()
+
+
 def s_min(lhe_ev_vis,lhe_ev_inv):
     """
         lhe_ev_vis: is a LHE subevent containing all the particles to be considered as visible
