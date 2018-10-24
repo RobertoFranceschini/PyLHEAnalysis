@@ -23,10 +23,10 @@ class LorentzVector(object):
         return LorentzVector(*[sum(x) for x in zip(lhs.components(),rhs.components())])
 
     def __sub__(lhs,rhs):
-        return LorentzVector(*[sum(x) for x in zip(lhs.components(),-rhs.components())])
+        return LorentzVector(*[sum(x) for x in zip(lhs.components(),rhs.minuscomponents())])
 
     def __mul__(lhs,rhs):
-        return contract_tuples(lhs,rhs,metric = METRIC):
+        return contract_tuples(lhs,rhs,metric = METRIC)
 
 
 
@@ -39,6 +39,10 @@ class LorentzVector(object):
 
     def components(self):
         return (self.px,self.py,self.pz,self.e)
+
+    def minuscomponents(self):
+        return (-self.px,-self.py,-self.pz,-self.e)
+
     def print_fv(self):
         print(self.px,self.py,self.pz,self.e)
 
