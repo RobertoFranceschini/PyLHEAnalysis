@@ -121,6 +121,18 @@ def theta(lhe_particles):
         _lv=lv.fourvector()+_lv
     return _lv.theta()
 
+def eta(lhe_particles):
+    _lv = lorentz.LorentzVector()
+    for lv in lhe_particles:
+        _lv=lv.fourvector()+_lv
+    return _lv.eta()
+
+def rapidity(lhe_particles):
+    _lv = lorentz.LorentzVector()
+    for lv in lhe_particles:
+        _lv=lv.fourvector()+_lv
+    return _lv.rapidity()
+
 def number(lhe_particles):
     res=0
     for lv in lhe_particles:
@@ -175,14 +187,15 @@ def missing_invariant_mass(lhe_particles):
 
 
 
-def s_min(lhe_ev_vis,lhe_ev_inv):
+def s_min(vis_inv):
     """
         lhe_ev_vis: is a LHE subevent containing all the particles to be considered as visible
         lhe_ev_inv: is a LHE subevent containing the one particle for the missing momentum
         in principle this observable depend on an external parameter, the mass of the invisible system
         this is for now fixed at zero and can be made an optional argument. in that case a dictionary input needs to be implemented in compute_obs_estensively
     """
-
+    lhe_ev_vis=vis_inv[0]
+    lhe_ev_inv=vis_inv[1]
     SumMinv = 0
     vis_sys=lorentz.LorentzVector()
     for vis in lhe_ev_vis.particles:
