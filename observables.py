@@ -151,6 +151,30 @@ def perp(lhe_particles):
         _lv=lv.fourvector()+_lv
     return _lv.perp()
 
+def SinThetaStar_of2(lhe_particles):
+    kZ=lhe_particles[0].fourvector()
+    kW=lhe_particles[1].fourvector()
+    kZ3 = np.array(kZ.three_components())
+    kW3 = np.array(kW.three_components())
+    #print(kZ3)
+    #print(kW3)
+    cross=np.sqrt(np.sum( np.cross(kZ3,kW3)**2 ) )
+    #print(cross)
+    kZ3+kW3
+    norm=np.sqrt(np.sum( (kZ3+kW3)**2) )
+
+    mW=kW.mass_safe()
+    mZ=kZ.mass_safe()
+    sZW=( (kZ+kW).mass() )**2
+
+    pStar=np.sqrt( ( sZW - (mZ-mW)**2 )*( sZW - (mZ+mW)**2 )/(4*sZW) )
+
+    res=cross/norm/pStar
+    #print(res)
+    return res
+
+
+
 def invariant_mass(lhe_particles):
     _lv = lorentz.LorentzVector()
     for lv in lhe_particles:
