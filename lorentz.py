@@ -36,6 +36,8 @@ class LorentzVector(object):
         self._pz = pz
         self._e = e
 
+    def three_components(self):
+        return (self.px,self.py,self.pz)
 
     def components(self):
         return (self.px,self.py,self.pz,self.e)
@@ -100,6 +102,9 @@ class LorentzVector(object):
 
     def mass(self):
         return  np.sqrt(self.e**2 - ( self.px**2 + self.py**2 + self.pz**2) )
+
+    def mass_safe(self):
+        return  np.sqrt(max(0, self.e**2 - ( self.px**2 + self.py**2 + self.pz**2) ) )
 
     def signed_mass_squared(self):
         return  np.sign(self.e**2 - ( self.px**2 + self.py**2 + self.pz**2) )  * np.sqrt(np.abs(self.e**2 - ( self.px**2 + self.py**2 + self.pz**2) ))
