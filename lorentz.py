@@ -2,6 +2,7 @@
 
 import math, sys
 import numpy as np
+import utils as u
 
 METRIC = [-1,-1,-1,1]
 
@@ -90,9 +91,14 @@ class LorentzVector(object):
     def phi(self):
         return np.arctan( self.py / self.px  )
 
+    def beta_vector(self):
+        return  np.array([ self.px/self.e , self.py/self.e , self.pz/self.e ] )
 
     def beta_scalar(self):
         return  np.sqrt(self.px**2 + self.py**2 + self.pz**2 )/self.e
+
+    def GammaOfBeta(beta):
+        return 1./np.sqrt(1.-beta**2)
 
     def gamma(self):
         return  self.e/np.sqrt(self.e**2 - (self.px**2 + self.py**2 + self.pz**2) )
@@ -120,3 +126,70 @@ class LorentzVector(object):
 
     def perp(self):
         return  np.sqrt( ( self.px**2 + self.py**2  ) )
+
+
+    def NewTriadFromLorentzVector(self,second3vector=None):
+        """
+        Takes a 4-vector and produces a new triad of orthonormal vectors \
+    suitable as coordinates for a reference frame with third component \
+    oriented along the given 3-vector. The result contains a matrix which applied to x,y,z gives v_i.
+    """
+        _beta=self.beta_vector()
+        _beta_u=u.versor(_beta)
+
+        if second3vector == None:
+            _random_lepton=np.random.rand(3)
+        else:
+            _random_lepton=second3vector
+
+        _lbetaort=np.cross(_beta,_random_lepton)
+        _lbetaort_u=u.versor(_lbetaort)
+
+        _lbetaortort=np.cross(_beta,_lbetaort)
+        _lbetaortort_u=u.versor(_lbetaortort)
+
+        result = {}
+        result['vectors']=np.array([_lbetaort_u,_lbetaortort_u,_beta_u])
+        result['x2prime']=result['vectors']
+        result['prime2x']=np.transpose(result['x2prime'])
+
+        return result
+
+    def Change3DBasis(self,newBasis):
+        _self3=self.three_components()
+        _newpxyz=[ np.dot(v,_self3) for v in newBasis ]
+        return LorentzVector(px=_newpxyz[0],py=_newpxyz[1],pz=_newpxyz[2],e=self.e)
+
+    def Change3DBasisRotation(self,rotation):
+        rotated=np.matmul(rotation,self.three_components() )
+        return LorentzVector( e=self.e, px=rotated[0], py=rotated[1], pz=rotated[2])
+
+    def BoostBetaAlongZ(self,beta):
+        return LorentzVector( e=self.e/np.sqrt(1 - beta**2) + (self.pz*beta)/np.sqrt(1 - beta**2), px= self.px, py=self.py, pz=self.pz/np.sqrt(1 - beta**2) + (self.e*beta)/np.sqrt(1 - beta**2 ) )
+
+    def ToMothersFrameWithZalongMotherParticleMomentum(self,Mother, DEBUG=False):
+        '''
+        This function applied to a daughter particle returns its four-vector in the frame where its mother is a rest. The Z axis of this rest frame is chosen so that it coincides with the direction of the boost beetween the rest frame of the mother and lab frame.
+        This function is useful to evaluate the angle between the W boson velocity and the lepton velocity in its decay.
+        '''
+        #Daughter=Self
+        if DEBUG: print(np.dot(Mother.NewTriadFromLorentzVector(second3vector=self.three_components() )['prime2x'],np.array([1,0,0]) )
+    )
+        # new triad with z-axis along mother momentum and y along daughter momentum y component
+        newBasis=Mother.NewTriadFromLorentzVector(second3vector=self.three_components() )
+        if DEBUG: print(newBasis['x2prime'])
+
+        # Dauther 4V in the new basis
+        newpl=self.Change3DBasis(newBasis['vectors'])
+        if DEBUG: print(newpl.components()) # same as in Mathematica
+
+        if DEBUG: print(Mother.beta_scalar()) # Same as in Mathematica
+
+        # Daughter 4V after a boost in the direction *opposite* to the boost of the mother
+        _lGen4VPrimeBoosted=newpl.BoostBetaAlongZ( -Mother.beta_scalar() )
+        if DEBUG: print(_lGen4VPrimeBoosted.components()) # Same as in Mathematica
+
+        # Daughter 4V rotated back to the original X,Y,Z (axes oriented as in the lab)
+        _lGen4VPrimeBoostedUnprimed=_lGen4VPrimeBoosted.Change3DBasisRotation( newBasis['prime2x'] )
+        print(_lGen4VPrimeBoostedUnprimed.components()) # Same as in Mathematica
+        return _lGen4VPrimeBoostedUnprimed
