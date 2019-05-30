@@ -104,10 +104,10 @@ class Numpy1DHistogramsData(object):
         if tup != None:
             self.histograms = [ Numpy1DHistogramData( tup = make_subtuple(tup, el) ) for el in range( len(tup[0]) ) ]
 
-    def ratio(self,wrt=0,uncertainties=None):
+def ratio(self,wrt=0,uncertainties=None,histogramType=Numpy1DHistogramsData):
         # default is to make the ratio of component-1 over component-0
         # if more than 2 histograms are present the result is the ratio component-I over component-0
-        result = Numpy1DHistogramsData()
+        result = histogramType()
         hDenominator=self.histograms[wrt]
         result.histograms = [ hNumerator.ratio(hDenominator,uncertainties=uncertainties) for hNumerator in self.histograms ]
         return result
