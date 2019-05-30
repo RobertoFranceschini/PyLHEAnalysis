@@ -178,7 +178,7 @@ class Numpy1DHistogramData(object):
 
 class Numpy2DHistogramData(object):
     """
-    A class able to hold two in its objects the resutl of histograms, e.g.
+    A class able to hold in its members the resutl of 2Dhistograms, e.g.
     counts , xedges , yedges , image
     from a 2D histogram done y matplotlib
     https://matplotlib.org/api/_as_gen/matplotlib.pyplot.hist2d.html
