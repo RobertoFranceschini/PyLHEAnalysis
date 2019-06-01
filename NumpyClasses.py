@@ -104,15 +104,6 @@ class Numpy1DHistogramsData(object):
         if tup != None:
             self.histograms = [ Numpy1DHistogramData( tup = make_subtuple(tup, el) ) for el in range( len(tup[0]) ) ]
 
-def ratio(self,wrt=0,uncertainties=None,histogramType=Numpy1DHistogramsData):
-        # default is to make the ratio of component-1 over component-0
-        # if more than 2 histograms are present the result is the ratio component-I over component-0
-        result = histogramType()
-        hDenominator=self.histograms[wrt]
-        result.histograms = [ hNumerator.ratio(hDenominator,uncertainties=uncertainties) for hNumerator in self.histograms ]
-        return result
-
-
 
 class Numpy1DHistogramData(object):
     """
@@ -145,35 +136,6 @@ class Numpy1DHistogramData(object):
             self.bins=np.array(bins) # same as numpy histogram bins output
 
 
-    def ratio(self,h2, uncertainties=None):
-        result = Numpy1DHistogramData() # an empty histogram, with None counts, bin edges, and uncertainties
-        result.counts = self.counts/h2.counts
-        result.label=self.label+" over "+h2.label
-        if  all(self.bins==h2.bins):
-            result.bins = self.bins
-        else:
-            print('bins did not match!','\n',self.bins==h2.bins,'\n',self.bins==h2.bins)
-
-        if uncertainties==None:
-            result.uncertainties = None # keep None as uncertainties
-        if uncertainties == "Gauss":
-            # make the gaussian uncertainty as if the values in the histograms were counts subject to sqrt(count) uncertainty
-            result.uncertainties = self.counts/h2.counts * u.sumQuadrature( [ np.sqrt(h2.counts)/h2.counts ,  np.sqrt(self.counts)/self.counts  ]  )
-        if uncertainties == "Propagate":
-            # use the uncertainty of each Histogram
-            result.uncertainties = self.counts/h2.counts * u.sumQuadrature( [ h2.uncertainties/h2.counts ,  self.uncertainties/self.counts  ]  )
-            # result.uncertainties = self.counts/h2.counts * np.sqrt( np.power(h2.uncertainties/h2.counts,2) + np.power(self.uncertainties/self.counts,2) )
-        if type(uncertainties) == float or type(uncertainties) == int:
-            if uncertainties > 1:
-                # assume this is the number of events in each histogram
-                _rescaling2 = uncertainties / np.sum(h2.counts)
-                _rescaling1 = uncertainties / np.sum(self.counts)
-
-                result.uncertainties = self.counts/h2.counts * u.sumQuadrature( [  np.sqrt(h2.counts)/h2.counts/np.sqrt(_rescaling2) ,  np.sqrt(self.counts)/self.counts /np.sqrt(_rescaling1) ]  )
-
-        return result
-
-
 
 
 class Numpy2DHistogramData(object):
@@ -192,6 +154,63 @@ class Numpy2DHistogramData(object):
         except IndexError:
             pass
 
+
+def ratioList(self,wrt=0,uncertainties=None,histogramType=Numpy1DHistogramsData):
+        # default is to make the ratio of component-1 over component-0
+        # if more than 2 histograms are present the result is the ratio component-I over component-0
+        result = histogramType()
+        hDenominator=self.histograms[wrt]
+        #the ratio member here is specific to the 1D class
+        result.histograms = [ ratioH1overH2(hNumerator,hDenominator,uncertainties=uncertainties,histogramType=histogramType) for hNumerator in self.histograms ]
+        return result
+
+def ratioH1overH2(self,h2, uncertainties=None,histogramType=Numpy1DHistogramsData):
+    result = histogramType() # an empty histogram, with None counts, bin edges, and uncertainties
+    result.counts = self.counts/h2.counts
+    try:
+        result.label=self.label+" over "+h2.label
+    except AttributeError:
+        print('no labels for this histogram ... keep going.')
+
+    try:
+        if  all(self.bins==h2.bins):
+            result.bins = self.bins
+        else:
+            print('bins did not match!','\n',self.bins==h2.bins,'\n',self.bins==h2.bins)
+    except AttributeError:
+        try:
+            if  all(self.xedges==h2.xedges):
+                if  all(self.yedges==h2.yedges):
+                    result.xedges = self.xedges
+                    result.yedges = self.yedges
+                else:
+                    print('yedges do not match')
+
+            else:
+                print('xedges do not match')
+        except AttributeError:
+            print('not same shape   ')
+
+
+
+    if uncertainties==None:
+        result.uncertainties = None # keep None as uncertainties
+    if uncertainties == "Gauss":
+        # make the gaussian uncertainty as if the values in the histograms were counts subject to sqrt(count) uncertainty
+        result.uncertainties = self.counts/h2.counts * u.sumQuadrature( [ np.sqrt(h2.counts)/h2.counts ,  np.sqrt(self.counts)/self.counts  ]  )
+    if uncertainties == "Propagate":
+        # use the uncertainty of each Histogram
+        result.uncertainties = self.counts/h2.counts * u.sumQuadrature( [ h2.uncertainties/h2.counts ,  self.uncertainties/self.counts  ]  )
+        # result.uncertainties = self.counts/h2.counts * np.sqrt( np.power(h2.uncertainties/h2.counts,2) + np.power(self.uncertainties/self.counts,2) )
+    if type(uncertainties) == float or type(uncertainties) == int:
+        if uncertainties > 1:
+            # assume this is the number of events in each histogram
+            _rescaling2 = uncertainties / np.sum(h2.counts)
+            _rescaling1 = uncertainties / np.sum(self.counts)
+
+            result.uncertainties = self.counts/h2.counts * u.sumQuadrature( [  np.sqrt(h2.counts)/h2.counts/np.sqrt(_rescaling2) ,  np.sqrt(self.counts)/self.counts /np.sqrt(_rescaling1) ]  )
+
+    return result
 
 class SignalStrengthData(object):
     """
