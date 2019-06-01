@@ -31,6 +31,8 @@ def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,label="",**kwargs):
     ax = histoPlot(histosRatios.histograms[1],fmt=',')
     histoPlot(histosRatios.histograms[0],lighter_error=1,fmt='.',ax=ax)
 
+    - fmt: is the format of the error bars
+
     This function assumes that the label of the histogram is stored in the histogram.label member. This can be superseeded by the label option
 
     This function assumes the histogram is 1D, as it uses the *bins* member. This is justified as error bars are usually only shown in 1D.
@@ -68,7 +70,7 @@ def make_label(labels,h,histos):
             return ""
 
 ##############################################
-def histoPlots( histos , labels=None,subset=None, **kwargs):
+def histoPlots( histos , labels=None, fmt=None,subset=None, **kwargs):
     ##############################################
     """
     Either labels are provided, or labels fro the histogram will be used. Either all the optional input or all the labels stored in the histogram can be used, not a mixed set.
@@ -77,85 +79,15 @@ def histoPlots( histos , labels=None,subset=None, **kwargs):
 
     if subset == None:
         subset = range(len(histos.histograms))
+    if fmt == None:
+            fmt = [ '.' for H in subset ]
 
-    [ histoPlot(histos.histograms[h],label=make_label(labels,h,histos),ax=ax,**kwargs) for h in subset  ]
+    [ histoPlot(histos.histograms[h],label=make_label(labels,h,histos),fmt=fmt[h],ax=ax,**kwargs) \
+    for h in subset  ]
     if labels != None or gotLabels(histos):
         ax.legend(bbox_to_anchor=[1,1])
 
     return ax
-
-class Numpy1DHistogramsData(object):
-    """
-    A class able to hold a number of Numpy1DHistogramData (single histograms).
-    The histograms are stored in the member "histograms" as a list of histograms, each of which carries its own bins and counts
-    It handles the output of plots and histograms from NumPy and Matplotlib, so it has an optional argument tup.
-    Can also be created as an array of histograms, originated each independently.
-    """
-    def __init__(self, tup=None):
-        #for each count vector in counts make a Numpy1DHistogramData
-
-        def make_subtuple(tup, el):
-            try:
-                res = tup[0][el], tup[1], tup[2]
-            except IndexError:
-                res = tup[0][el], tup[1]
-
-            return res
-
-        self.histograms = []
-        if tup != None:
-            self.histograms = [ Numpy1DHistogramData( tup = make_subtuple(tup, el) ) for el in range( len(tup[0]) ) ]
-
-
-class Numpy1DHistogramData(object):
-    """
-    A class able to hold two in its objects the resutl of histograms, e.g.
-    counts , binedges  from a 1D histogram
-    https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html?highlight=histogram#numpy.histogram
-    """
-    # def __init__(self,tup):
-    #     self.counts=tup[0]
-    #     self.bins=tup[1]
-    #     try:
-    #         self.patches=tup[2]
-    #     except IndexError:
-    #         pass
-
-    def __init__(self,counts=None,bins=None,uncertainties=None,label="",tup=None):
-        # the uncertaintis member is filled in all cases
-        # the counts and bins can be valorized with ther the named optional parameters or from the histogram tuple output
-        self.uncertainties=np.array(uncertainties)
-        self.label=label
-        if tup != None:
-            self.counts=tup[0]
-            self.bins=tup[1]
-            try:
-                self.patches=tup[2]
-            except IndexError:
-                pass
-        else:
-            self.counts=np.array(counts)
-            self.bins=np.array(bins) # same as numpy histogram bins output
-
-
-
-
-class Numpy2DHistogramData(object):
-    """
-    A class able to hold in its members the resutl of 2Dhistograms, e.g.
-    counts , xedges , yedges , image
-    from a 2D histogram done y matplotlib
-    https://matplotlib.org/api/_as_gen/matplotlib.pyplot.hist2d.html
-    """
-    def __init__(self,tup):
-        self.counts=tup[0]
-        self.xedges=tup[1]
-        self.yedges=tup[2]
-        try:
-            self.image=tup[3]
-        except IndexError:
-            pass
-
 
 def ratioList(self,wrt=0,uncertainties=None,histogramType=Numpy1DHistogramsData):
         # default is to make the ratio of component-1 over component-0
@@ -213,6 +145,81 @@ def ratioH1overH2(self,h2, uncertainties=None,histogramType=Numpy1DHistogramsDat
             result.uncertainties = self.counts/h2.counts * u.sumQuadrature( [  np.sqrt(h2.counts)/h2.counts/np.sqrt(_rescaling2) ,  np.sqrt(self.counts)/self.counts /np.sqrt(_rescaling1) ]  )
 
     return result
+
+
+
+class Numpy1DHistogramData(object):
+    """
+    A class able to hold two in its objects the resutl of histograms, e.g.
+    counts , binedges  from a 1D histogram
+    https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html?highlight=histogram#numpy.histogram
+    """
+    # def __init__(self,tup):
+    #     self.counts=tup[0]
+    #     self.bins=tup[1]
+    #     try:
+    #         self.patches=tup[2]
+    #     except IndexError:
+    #         pass
+
+    def __init__(self,counts=None,bins=None,uncertainties=None,label="",tup=None):
+        # the uncertaintis member is filled in all cases
+        # the counts and bins can be valorized with ther the named optional parameters or from the histogram tuple output
+        self.uncertainties=np.array(uncertainties)
+        self.label=label
+        if tup != None:
+            self.counts=tup[0]
+            self.bins=tup[1]
+            try:
+                self.patches=tup[2]
+            except IndexError:
+                pass
+        else:
+            self.counts=np.array(counts)
+            self.bins=np.array(bins) # same as numpy histogram bins output
+
+class Numpy1DHistogramsData(object):
+    """
+    A class able to hold a number of Numpy1DHistogramData (single histograms).
+    The histograms are stored in the member "histograms" as a list of histograms, each of which carries its own bins and counts
+    It handles the output of plots and histograms from NumPy and Matplotlib, so it has an optional argument tup.
+    Can also be created as an array of histograms, originated each independently.
+    """
+    def __init__(self, tup=None):
+        #for each count vector in counts make a Numpy1DHistogramData
+
+        def make_subtuple(tup, el):
+            try:
+                res = tup[0][el], tup[1], tup[2]
+            except IndexError:
+                res = tup[0][el], tup[1]
+
+            return res
+
+        self.histograms = []
+        if tup != None:
+            self.histograms = [ Numpy1DHistogramData( tup = make_subtuple(tup, el) ) for el in range( len(tup[0]) ) ]
+
+
+class Numpy2DHistogramData(object):
+    """
+    A class able to hold in its members the resutl of 2Dhistograms, e.g.
+    counts , xedges , yedges , image
+    from a 2D histogram done y matplotlib
+    https://matplotlib.org/api/_as_gen/matplotlib.pyplot.hist2d.html
+    Please not that the output of numpy would use only a 3-dim tuples
+    https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram2d.html
+    """
+    def __init__(self,tup):
+        self.counts=tup[0]
+        self.xedges=tup[1]
+        self.yedges=tup[2]
+        try:
+            self.image=tup[3]
+        except IndexError:
+            pass
+
+
 
 class SignalStrengthData(object):
     """
