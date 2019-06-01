@@ -45,14 +45,22 @@ def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,label="",**kwargs):
     # Get the current color in the cycle     #https://stackoverflow.com/questions/28779559/how-to-set-same-color-for-markers-and-lines-in-a-matplotlib-plot-loop
     color = next(ax._get_lines.prop_cycler)['color']
 
-    if gotUncertainties(h):
-        # plot the error bar https://matplotlib.org/gallery/statistics/errorbar_features.html?highlight=error%20plot
-        ax.errorbar(u.midpoints(h.bins), h.counts, yerr=h.uncertainties,color = u.lighten_color(color,lighter_error),fmt=fmt,**kwargs )
-
+    # settle the labels.
+    # labels in the errorbar plot wil have precedence
     _label = h.label
-    # plot the histogram
     if label != "":
         _label = label
+
+    if gotUncertainties(h):
+        # plot the error bar https://matplotlib.org/gallery/statistics/errorbar_features.html?highlight=error%20plot
+        ax.errorbar(u.midpoints(h.bins), h.counts, yerr=h.uncertainties,\
+        label=_label,\
+        color = u.lighten_color(color,lighter_error),fmt=fmt,**kwargs )
+    if _label != "":
+        _label=None
+
+    # plot the histogram
+
     ax.step(h.bins,np.append(h.counts,h.counts[-1:]),where='post',color=color,label=_label,**kwargs)
     return ax
 
@@ -80,7 +88,10 @@ def histoPlots( histos , labels=None, fmt=None,subset=None, **kwargs):
     if subset == None:
         subset = range(len(histos.histograms))
     if fmt == None:
-            fmt = [ '.' for H in subset ]
+        fmt = [ '.' for H in subset ]
+    if type(fmt) is str:
+        fmt = [ fmt for H in subset ]
+
 
     [ histoPlot(histos.histograms[h],label=make_label(labels,h,histos),fmt=fmt[h],ax=ax,**kwargs) \
     for h in subset  ]
