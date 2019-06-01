@@ -47,7 +47,7 @@ def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,label="",**kwargs):
 
     if gotUncertainties(h):
         # plot the error bar https://matplotlib.org/gallery/statistics/errorbar_features.html?highlight=error%20plot
-        ax.errorbar(u.midpoints(h.bins), h.counts, yerr=h.uncertainties,color = u.lighten_color(color,lighter_error),fmt=fmt )
+        ax.errorbar(u.midpoints(h.bins), h.counts, yerr=h.uncertainties,color = u.lighten_color(color,lighter_error),fmt=fmt,**kwargs )
 
     _label = h.label
     # plot the histogram
