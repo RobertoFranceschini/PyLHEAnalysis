@@ -32,6 +32,8 @@ def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,label="",**kwargs):
     histoPlot(histosRatios.histograms[0],lighter_error=1,fmt='.',ax=ax)
 
     This function assumes that the label of the histogram is stored in the histogram.label member. This can be superseeded by the label option
+
+    This function assumes the histogram is 1D, as it uses the *bins* member. This is justified as error bars are usually only shown in 1D.
     """
     if ax is None:
         ax = plt.axes()
