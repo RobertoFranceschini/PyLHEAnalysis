@@ -199,9 +199,9 @@ def ratioList(self,wrt=0,uncertainties=None,histogramType=NumpyHistogramData):
         result.histograms = [ ratioH1overH2(hNumerator,hDenominator,uncertainties=uncertainties,histogramType=histogramType) for hNumerator in self.histograms ]
         return result
 
-def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData):
+def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData,counts='counts'):
     result = histogramType() # an empty histogram, with None counts, bin edges, and uncertainties
-    result.counts = self.counts/h2.counts
+    setattr(result,counts,  getattr(self,counts)/getattr(h2,counts) )
     try:
         result.label=self.label+" over "+h2.label
     except AttributeError:
