@@ -190,13 +190,13 @@ def histoPlots( histos , labels=None, fmt=None,subset=None, **kwargs):
 
     return ax
 
-def ratioList(self,wrt=0,uncertainties=None,histogramType=NumpyHistogramData):
+def ratioList(self,wrt=0,uncertainties=None,histogramType=NumpyHistogramData,counts='counts'):
         # default is to make the ratio of component-1 over component-0
         # if more than 2 histograms are present the result is the ratio component-I over component-0
         result = histogramType()
         hDenominator=self.histograms[wrt]
         #the ratio member here is specific to the 1D class
-        result.histograms = [ ratioH1overH2(hNumerator,hDenominator,uncertainties=uncertainties,histogramType=histogramType) for hNumerator in self.histograms ]
+        result.histograms = [ ratioH1overH2(hNumerator,hDenominator,uncertainties=uncertainties,histogramType=histogramType,counts=counts) for hNumerator in self.histograms ]
         return result
 
 def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData,counts='counts'):
