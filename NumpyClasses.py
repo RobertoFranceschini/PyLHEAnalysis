@@ -4,9 +4,99 @@ Classes having the purpose to
 2) manipulate the numpy outputs in a way that accomplishes standard tasks, e.g. setting a 1D limit on a signal strenght
 """
 
+import matplotlib
+import numpy
 import numpy as np
 import utils as u
 import matplotlib.pyplot as plt
+
+
+def standardize_tuple(tup):
+    ''' It returns a tuple in the format:
+     - tuple[0] = list of counts (can be a tensor, it does not matter because it can still be added, multipled or divided by other same-shape tensors and constants)
+     - tuple[1] = list of bin edges same shape as the input (as for histogramdd!)
+     - tuple[2] = image or patches from matplotlib
+    '''
+    if type(tup[-1]) is matplotlib.cbook.silent_list: # is matplotlib.hist
+        newtup=tup[0],tup[1],tup[2]
+    if type(tup[-1]) is matplotlib.image.AxesImage: # is matplotlib.hist2d v.2
+        newtup=tup[0],(tup[1],tup[2]),tup[3]
+    if type(tup[-1]) is matplotlib.collections.QuadMesh: # is matplotlib.hist2d v.3
+        newtup=tup[0],(tup[1],tup[2]),tup[3]
+    if type(tup[-1]) is list: # is a numpy.histogramdd
+        newtup=tup+(None,)
+    if type(tup[-1]) is numpy.ndarray: # is either  numpy.histogram2d or numpy.histogram
+        # if is from histogram2d it has 3 elements in the tuple
+        # otherwise histogram and histogramdd give only 2 elements
+        try: # if is a 2D histo
+            newtup=tup[0],(tup[1],tup[2]),None
+        except IndexError: # it is a 1D histo
+            newtup=tup+(None,)
+    return newtup
+
+class NumpyHistogramData(object):
+    """
+    A class able to hold Matplot histograms or NumPy histograms, e.g.
+    counts , binedges  from a 1D histogram
+    https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html
+
+    - counts: The counts are stored in the attribute *counts*. These are in general D-dimensional arrays depending on the type of input. The idea is to keep the D-dimensional structure as from the output of Matplotlib or Numpy histograms plot/functions.
+
+    - bins: The bins are indicated by their delimiters, as in the MatplotLib and NumPy functions, but are collected in a single member called *bins* (using the notation of the most used Matplotlib matplotlib.pyplot.hist.html function
+    https://matplotlib.org/api/_as_gen/matplotlib.pyplot.hist.html)
+
+    - edges: same as bins. It is kept for clarity of nomenclature when dealing with D>1. In that case the name "edges" appears less error prone.
+
+    - images: the output in the last component of the tuple of Matplotlib functions, either patches or image
+
+    *) The idea is that counts can be divided, multiplied or summed to scalrs or other counts from the same shape D-dimentional histogram. This allows to define methods that work with exact same syntax on any Dimension.
+    *) bins|edges are checked for equality of shape&content when these operation are performed and then are returned "as is". Being the dimensionality of the histogram not fixed methods that affect the bins (e.g. merging, rescaling) cannot be implemented for the generic class member except in very simple cases. A case-by-case solution may be available, e.g. such as the "axis" optional variable of Pandas and NumPy tables.
+    """
+
+    def __init__(self,counts=None,bins=None,uncertainties=None,label="",tup=None):
+
+        # the uncertaintis and label member are filled in all cases
+        self.uncertainties=np.array(uncertainties)
+        self.label=label
+        if tup != None: # input from a Numpy or Matplotlib function
+            _tup=standardize_tuple(tup)
+            self.counts=_tup[0]
+            self.bins=_tup[1]
+            self.edges=_tup[1]
+            self.images=_tup[2]
+        else: # histogram entered by hand
+            self.counts=np.array(counts)
+            self.bins=np.array(bins) # same as numpy histogram bins output
+
+class NumpyVectorHistogramData(object):
+    """
+    A class able to hold a set of NumpyHistogramData (single histograms).
+    The histograms are stored in the member "histograms" as a list of histograms, each of which carries its own bins and counts
+    - It handles *directly* the output  1D histograms of Matplotlib put in the same plot. This is achived feeding the optional argument tup.
+
+    - Can also be created as an array of histograms, each originated independently and appended to the histogram member.
+    """
+    def __init__(self, tup=None):
+        #for each count vector in counts make a Numpy1DHistogramData
+
+        def make_subtuple(tup, el):
+            '''
+            Function to be used if tuple is given. It translate the tuple from matplotlib.pyplot.hist
+            https://matplotlib.org/api/_as_gen/matplotlib.pyplot.hist.html
+            into a collection of NumpyHistogramData
+            '''
+            try: # matplotlib.pyplot.hist multiple histograms
+                res = standardize_tuple((tup[0][el], tup[1], tup[2]))
+            except IndexError: # tup[2] may be missing, e.g. because the histograms where made by hand
+                res = standardize_tuple((tup[0][el], tup[1]))
+                # the standardize functions takes care of the missing component as it treats it as
+                # if it was done my numpy.histogram
+
+            return res
+
+        self.histograms = []
+        if tup != None:
+            self.histograms = [ NumpyHistogramData( tup = make_subtuple(tup, el) ) for el in range( len(tup[0]) ) ]
 
 ##############################################
 def gotLabels(histos):
@@ -48,7 +138,7 @@ def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,label="",**kwargs):
     # settle the labels.
     # labels in the errorbar plot wil have precedence
     _label = h.label
-    if label != "":
+    if label != "": # label was given
         _label = label
 
     if gotUncertainties(h):
@@ -56,8 +146,8 @@ def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,label="",**kwargs):
         ax.errorbar(u.midpoints(h.bins), h.counts, yerr=h.uncertainties,\
         label=_label,\
         color = u.lighten_color(color,lighter_error),fmt=fmt,**kwargs )
-    if _label != "":
-        _label=None
+        _label=None # label was used, let us reset it to None
+
 
     # plot the histogram
 
@@ -100,7 +190,7 @@ def histoPlots( histos , labels=None, fmt=None,subset=None, **kwargs):
 
     return ax
 
-def ratioList(self,wrt=0,uncertainties=None,histogramType=Numpy1DHistogramsData):
+def ratioList(self,wrt=0,uncertainties=None,histogramType=NumpyHistogramData):
         # default is to make the ratio of component-1 over component-0
         # if more than 2 histograms are present the result is the ratio component-I over component-0
         result = histogramType()
@@ -109,7 +199,7 @@ def ratioList(self,wrt=0,uncertainties=None,histogramType=Numpy1DHistogramsData)
         result.histograms = [ ratioH1overH2(hNumerator,hDenominator,uncertainties=uncertainties,histogramType=histogramType) for hNumerator in self.histograms ]
         return result
 
-def ratioH1overH2(self,h2, uncertainties=None,histogramType=Numpy1DHistogramsData):
+def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData):
     result = histogramType() # an empty histogram, with None counts, bin edges, and uncertainties
     result.counts = self.counts/h2.counts
     try:
@@ -118,23 +208,28 @@ def ratioH1overH2(self,h2, uncertainties=None,histogramType=Numpy1DHistogramsDat
         print('no labels for this histogram ... keep going.')
 
     try:
-        if  all(self.bins==h2.bins):
+        if  np.array_equal(self.bins,h2.bins):#all(self.bins==h2.bins):
             result.bins = self.bins
-        else:
-            print('bins did not match!','\n',self.bins==h2.bins,'\n',self.bins==h2.bins)
-    except AttributeError:
+    except TypeError:
         try:
-            if  all(self.xedges==h2.xedges):
-                if  all(self.yedges==h2.yedges):
-                    result.xedges = self.xedges
-                    result.yedges = self.yedges
-                else:
-                    print('yedges do not match')
-
-            else:
-                print('xedges do not match')
+            if  self.bins==h2.bins:
+                result.bins = self.bins
         except AttributeError:
-            print('not same shape   ')
+            print('bins not same shape')
+
+    result.edges = result.bins
+
+    # except AttributeError:
+    #     try:
+    #         if  all(self.xedges==h2.xedges):
+    #             if  all(self.yedges==h2.yedges):
+    #                 result.xedges = self.xedges
+    #                 result.yedges = self.yedges
+    #             else:
+    #                 print('yedges do not match')
+    #
+    #         else:
+    #             print('xedges do not match')
 
 
 
