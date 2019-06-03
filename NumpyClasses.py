@@ -114,7 +114,7 @@ def gotUncertainties(h):
     return result
 
 ##############################################
-def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,counts='counts',label="",**kwargs):
+def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,counts='counts', bins='bins',label="",**kwargs):
     ##############################################
     """
     example usage to plot on the same figure
@@ -143,7 +143,7 @@ def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,counts='counts',label="",**kw
 
     if gotUncertainties(h):
         # plot the error bar https://matplotlib.org/gallery/statistics/errorbar_features.html?highlight=error%20plot
-        ax.errorbar(u.midpoints(h.bins), getattr(h,counts), yerr=h.uncertainties,\
+        ax.errorbar(u.midpoints(getattr(h,bins)), getattr(h,counts), yerr=h.uncertainties,\
         label=_label,\
         color = u.lighten_color(color,lighter_error),fmt=fmt,**kwargs )
         _label=None # label was used, let us reset it to None
@@ -151,7 +151,7 @@ def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,counts='counts',label="",**kw
 
     # plot the histogram
 
-    ax.step(h.bins,np.append(getattr(h,counts),getattr(h,counts)[-1:]),where='post',color=color,label=_label,**kwargs)
+    ax.step(getattr(h,bins),np.append(getattr(h,counts),getattr(h,counts)[-1:]),where='post',color=color,label=_label,**kwargs)
     return ax
 
 ##############################################
@@ -168,7 +168,7 @@ def make_label(labels,h,histos):
             return ""
 
 ##############################################
-def histoPlots( histos , labels=None, fmt=None,subset=None, counts='counts', **kwargs):
+def histoPlots( histos , labels=None, fmt=None,subset=None, bins='bins', counts='counts', **kwargs):
     ##############################################
     """
     Either labels are provided, or labels fro the histogram will be used. Either all the optional input or all the labels stored in the histogram can be used, not a mixed set.
@@ -183,7 +183,7 @@ def histoPlots( histos , labels=None, fmt=None,subset=None, counts='counts', **k
         fmt = [ fmt for H in subset ]
 
 
-    [ histoPlot(histos.histograms[h],label=make_label(labels,h,histos),fmt=fmt[h],ax=ax,counts=counts,**kwargs) \
+    [ histoPlot(histos.histograms[h],label=make_label(labels,h,histos),fmt=fmt[h],ax=ax,bins=bins, counts=counts,**kwargs) \
     for h in subset  ]
     if labels != None or gotLabels(histos):
         ax.legend(bbox_to_anchor=[1,1])
