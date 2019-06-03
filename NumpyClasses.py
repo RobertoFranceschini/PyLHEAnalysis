@@ -167,6 +167,11 @@ def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,counts='counts', bins='bins',
     if counts=='snake':
         _x = np.append(getattr(h,bins),getattr(h,bins)[-1]+1)
         _y=np.append( getattr(h,counts),getattr(h,counts)[-1:] ) #getattr(h,counts)
+        # picture control for snake labels and readability
+        ax.set_xticklabels(h.snakelabels)
+        plt.setp(ax.get_xticklabels(), rotation=-30, ha="left",
+             rotation_mode="anchor")
+
 
     ax.step(_x,_y,where='post',color=color,label=_label,**step_kw,**kwargs)
     return ax
