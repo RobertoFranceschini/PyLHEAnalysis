@@ -190,16 +190,16 @@ def histoPlots( histos , labels=None, fmt=None,subset=None, bins='bins', counts=
 
     return ax
 
-def ratioList(self,wrt=0,uncertainties=None,histogramType=NumpyHistogramData,counts='counts'):
+def ratioList(self,wrt=0,uncertainties=None,histogramType=NumpyHistogramData,bins='bins',counts='counts'):
         # default is to make the ratio of component-1 over component-0
         # if more than 2 histograms are present the result is the ratio component-I over component-0
         result = histogramType()
         hDenominator=self.histograms[wrt]
         #the ratio member here is specific to the 1D class
-        result.histograms = [ ratioH1overH2(hNumerator,hDenominator,uncertainties=uncertainties,histogramType=histogramType,counts=counts) for hNumerator in self.histograms ]
+        result.histograms = [ ratioH1overH2(hNumerator,hDenominator,uncertainties=uncertainties,histogramType=histogramType,bins=bins,counts=counts) for hNumerator in self.histograms ]
         return result
 
-def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData,counts='counts'):
+def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData,bins='bins',counts='counts'):
     result = histogramType() # an empty histogram, with None counts, bin edges, and uncertainties
     setattr(result,counts,  getattr(self,counts)/getattr(h2,counts) )
     try:
@@ -208,16 +208,16 @@ def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData,c
         print('no labels for this histogram ... keep going.')
 
     try:
-        if  np.array_equal(self.bins,h2.bins):#all(self.bins==h2.bins):
-            result.bins = self.bins
+        if  np.array_equal(getattr(self,bins),getattr(h2,bins)):#all(self.bins==h2.bins):
+            setattr( result, bins,  getattr(self,bins) )
     except TypeError:
         try:
-            if  self.bins==h2.bins:
-                result.bins = self.bins
+            if  getattr(self,bins)==getattr(h2,bins):
+                setattr(result,bins, getattr(self,bins) )
         except AttributeError:
             print('bins not same shape')
 
-    result.edges = result.bins
+    result.edges = getattr(result,bins)
 
     # except AttributeError:
     #     try:
@@ -237,18 +237,18 @@ def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData,c
         result.uncertainties = None # keep None as uncertainties
     if uncertainties == "Gauss":
         # make the gaussian uncertainty as if the values in the histograms were counts subject to sqrt(count) uncertainty
-        result.uncertainties = self.counts/h2.counts * u.sumQuadrature( [ np.sqrt(h2.counts)/h2.counts ,  np.sqrt(self.counts)/self.counts  ]  )
+        result.uncertainties = getattr(self,counts)/getattr(h2,counts) * u.sumQuadrature( [ np.sqrt(getattr(h2,counts))/getattr(h2,counts) ,  np.sqrt(getattr(self,counts))/getattr(self,counts)  ]  )
     if uncertainties == "Propagate":
         # use the uncertainty of each Histogram
-        result.uncertainties = self.counts/h2.counts * u.sumQuadrature( [ h2.uncertainties/h2.counts ,  self.uncertainties/self.counts  ]  )
+        result.uncertainties = getattr(self,counts)/getattr(h2,counts) * u.sumQuadrature( [ h2.uncertainties/getattr(h2,counts) ,  self.uncertainties/getattr(self,counts)  ]  )
         # result.uncertainties = self.counts/h2.counts * np.sqrt( np.power(h2.uncertainties/h2.counts,2) + np.power(self.uncertainties/self.counts,2) )
     if type(uncertainties) == float or type(uncertainties) == int:
         if uncertainties > 1:
             # assume this is the number of events in each histogram
-            _rescaling2 = uncertainties / np.sum(h2.counts)
-            _rescaling1 = uncertainties / np.sum(self.counts)
+            _rescaling2 = uncertainties / np.sum(getattr(h2,counts))
+            _rescaling1 = uncertainties / np.sum(getattr(self,counts))
 
-            result.uncertainties = self.counts/h2.counts * u.sumQuadrature( [  np.sqrt(h2.counts)/h2.counts/np.sqrt(_rescaling2) ,  np.sqrt(self.counts)/self.counts /np.sqrt(_rescaling1) ]  )
+            result.uncertainties = getattr(self,counts)/getattr(h2,counts) * u.sumQuadrature( [  np.sqrt(getattr(h2,counts))/getattr(h2,counts)/np.sqrt(_rescaling2) ,  np.sqrt(getattr(self,counts))/getattr(self,counts) /np.sqrt(_rescaling1) ]  )
 
     return result
 
