@@ -226,11 +226,13 @@ def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData,b
     except AttributeError:
         print('no labels for this histogram ... keep going.')
 
-    try:
+    try: # this normally goes through, np.array_equal is very powerful
         if  np.array_equal(getattr(self,bins),getattr(h2,bins)):#all(self.bins==h2.bins):
             setattr( result, bins,  getattr(self,bins) )
             if DEBUG: print('set ',bins)
             if DEBUG: print(getattr(result,bins))
+            if bins == 'snake'
+                setattr( result, 'snakelabels',  getattr(self,'snakelabels') )
     except TypeError:
         try:
             if  getattr(self,bins)==getattr(h2,bins):
