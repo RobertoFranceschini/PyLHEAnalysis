@@ -114,7 +114,7 @@ def gotUncertainties(h):
     return result
 
 ##############################################
-def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,counts='counts', bins='bins',label="",**kwargs):
+def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,counts='counts', bins='bins',label="",errorbar_kw={'capsize':5, 'elinewidth':1, 'markeredgewidth':1},step_kw={},**kwargs):
     ##############################################
     """
     example usage to plot on the same figure
@@ -122,6 +122,9 @@ def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,counts='counts', bins='bins',
     histoPlot(histosRatios.histograms[0],lighter_error=1,fmt='.',ax=ax)
 
     - fmt: is the format of the error bars
+    - errorbar_kw is the dictionary of options passed to the error bar plot
+    - step_kw is the dictionary of options passed to the step plot
+    - kwargs must is common to step and errorbar
 
     This function assumes that the label of the histogram is stored in the histogram.label member. This can be superseeded by the label option
 
@@ -151,7 +154,8 @@ def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,counts='counts', bins='bins',
             _y= getattr(h,counts)
         ax.errorbar(_x, _y, yerr=h.uncertainties,\
         label=_label,\
-        color = u.lighten_color(color,lighter_error),fmt=fmt,**kwargs )
+        color = u.lighten_color(color,lighter_error),fmt=fmt,\
+        **errorbar_kw,**kwargs )
         _label=None # label was used, let us reset it to None
 
 
@@ -164,7 +168,7 @@ def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,counts='counts', bins='bins',
         _x = np.append(getattr(h,bins),getattr(h,bins)[-1]+1)
         _y=np.append( getattr(h,counts),getattr(h,counts)[-1:] ) #getattr(h,counts)
 
-    ax.step(_x,_y,where='post',color=color,label=_label,**kwargs)
+    ax.step(_x,_y,where='post',color=color,label=_label,**step_kw,**kwargs)
     return ax
 
 ##############################################
