@@ -200,8 +200,8 @@ def histoPlots( histos , labels=None, fmt=None,subset=None, bins='bins', counts=
         fmt = [ fmt for H in subset ]
 
 
-    [ histoPlot(histos.histograms[h],label=make_label(labels,h,histos),fmt=fmt[h],ax=ax,bins=bins, counts=counts, **kwargs) \
-    for h in subset  ]
+    [ histoPlot(histos.histograms[h],label=make_label(labels,h,histos),fmt=fmt[en],ax=ax,bins=bins, counts=counts, **kwargs) \
+    for en,h in enumerate(subset)  ]
     if labels != None or gotLabels(histos):
         ax.legend(bbox_to_anchor=[1,1])
 
