@@ -216,11 +216,11 @@ def ratioList(self,wrt=0,uncertainties=None,histogramType=NumpyHistogramData,bin
         result.histograms = [ ratioH1overH2(hNumerator,hDenominator,uncertainties=uncertainties,histogramType=histogramType,bins=bins,counts=counts) for hNumerator in self.histograms ]
         return result
 
-def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData,bins='bins',counts='counts'):
+def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData,bins='bins',counts='counts',DEBUG=False):
     result = histogramType() # an empty histogram, with None counts, bin edges, and uncertainties
     setattr(result,counts,  getattr(self,counts)/getattr(h2,counts) )
-    print('set ',counts)
-    print( getattr(result,counts) )
+    if DEBUG: print('set ',counts)
+    if DEBUG: print( getattr(result,counts) )
     try:
         result.label=self.label+" over "+h2.label
     except AttributeError:
@@ -229,8 +229,8 @@ def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData,b
     try:
         if  np.array_equal(getattr(self,bins),getattr(h2,bins)):#all(self.bins==h2.bins):
             setattr( result, bins,  getattr(self,bins) )
-            print('set ',bins)
-            print(getattr(result,bins))
+            if DEBUG: print('set ',bins)
+            if DEBUG: print(getattr(result,bins))
     except TypeError:
         try:
             if  getattr(self,bins)==getattr(h2,bins):
