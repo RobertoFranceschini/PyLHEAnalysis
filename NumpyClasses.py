@@ -143,7 +143,13 @@ def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,counts='counts', bins='bins',
 
     if gotUncertainties(h):
         # plot the error bar https://matplotlib.org/gallery/statistics/errorbar_features.html?highlight=error%20plot
-        ax.errorbar(u.midpoints(getattr(h,bins)), getattr(h,counts), yerr=h.uncertainties,\
+        if counts=='counts':
+            _x = u.midpoints(getattr(h,bins))
+            _y = getattr(h,counts)
+        if counts=='snake':
+            _x = u.midpoints(np.append(getattr(h,bins),getattr(h,bins)[-1]+1)) #getattr(h,bins)
+            _y= getattr(h,counts)
+        ax.errorbar(_x, _y, yerr=h.uncertainties,\
         label=_label,\
         color = u.lighten_color(color,lighter_error),fmt=fmt,**kwargs )
         _label=None # label was used, let us reset it to None
@@ -151,7 +157,14 @@ def histoPlot(h,fmt='.',lighter_error=0.75,ax=None,counts='counts', bins='bins',
 
     # plot the histogram
 
-    ax.step(getattr(h,bins),np.append(getattr(h,counts),getattr(h,counts)[-1:]),where='post',color=color,label=_label,**kwargs)
+    if counts=='counts':
+        _x=getattr(h,bins)
+        _y=np.append( getattr(h,counts),getattr(h,counts)[-1:] )
+    if counts=='snake':
+        _x = np.append(getattr(h,bins),getattr(h,bins)[-1]+1)
+        _y=np.append( getattr(h,counts),getattr(h,counts)[-1:] ) #getattr(h,counts)
+
+    ax.step(_x,_y,where='post',color=color,label=_label,**kwargs)
     return ax
 
 ##############################################
@@ -183,7 +196,7 @@ def histoPlots( histos , labels=None, fmt=None,subset=None, bins='bins', counts=
         fmt = [ fmt for H in subset ]
 
 
-    [ histoPlot(histos.histograms[h],label=make_label(labels,h,histos),fmt=fmt[h],ax=ax,bins=bins, counts=counts,**kwargs) \
+    [ histoPlot(histos.histograms[h],label=make_label(labels,h,histos),fmt=fmt[h],ax=ax,bins=bins, counts=counts, **kwargs) \
     for h in subset  ]
     if labels != None or gotLabels(histos):
         ax.legend(bbox_to_anchor=[1,1])
@@ -202,6 +215,8 @@ def ratioList(self,wrt=0,uncertainties=None,histogramType=NumpyHistogramData,bin
 def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData,bins='bins',counts='counts'):
     result = histogramType() # an empty histogram, with None counts, bin edges, and uncertainties
     setattr(result,counts,  getattr(self,counts)/getattr(h2,counts) )
+    print('set ',counts)
+    print( getattr(result,counts) )
     try:
         result.label=self.label+" over "+h2.label
     except AttributeError:
@@ -210,10 +225,13 @@ def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData,b
     try:
         if  np.array_equal(getattr(self,bins),getattr(h2,bins)):#all(self.bins==h2.bins):
             setattr( result, bins,  getattr(self,bins) )
+            print('set ',bins)
+            print(getattr(result,bins))
     except TypeError:
         try:
             if  getattr(self,bins)==getattr(h2,bins):
                 setattr(result,bins, getattr(self,bins) )
+                print('set 2')
         except AttributeError:
             print('bins not same shape')
 
