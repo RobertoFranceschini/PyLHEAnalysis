@@ -231,8 +231,10 @@ def ratioH1overH2(self,h2, uncertainties=None,histogramType=NumpyHistogramData,b
             setattr( result, bins,  getattr(self,bins) )
             if DEBUG: print('set ',bins)
             if DEBUG: print(getattr(result,bins))
-            if bins == 'snake'
+            if counts == 'snake':
+                if DEBUG: print('setting snakelabels')
                 setattr( result, 'snakelabels',  getattr(self,'snakelabels') )
+                if DEBUG: print( getattr(result,'snakelabels'))
     except TypeError:
         try:
             if  getattr(self,bins)==getattr(h2,bins):
