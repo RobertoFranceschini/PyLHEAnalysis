@@ -91,6 +91,8 @@ class LorentzVector(object):
     def phi(self):
         return np.arctan( self.py / self.px  )
 
+
+
     def beta_vector(self):
         return  np.array([ self.px/self.e , self.py/self.e , self.pz/self.e ] )
 
@@ -154,6 +156,18 @@ class LorentzVector(object):
         result['prime2x']=np.transpose(result['x2prime'])
 
         return result
+
+    def phi_wrt_reference(self,reference=None,second3vector=(0,0,1), DEBUG=False):
+        if reference is not None:
+            newBasis=reference.NewTriadFromLorentzVector(second3vector=second3vector )
+            if DEBUG: print(newBasis['x2prime'])
+            if DEBUG: print(newBasis['vectors'])
+            newpl=self.Change3DBasis(newBasis['vectors'])
+            return newpl.phi()
+        else:
+            print('The named paramter *reference* needs to be specified')
+            return np.nan()
+
 
     def Change3DBasis(self,newBasis):
         _self3=self.three_components()
