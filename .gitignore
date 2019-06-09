@@ -2,3 +2,4 @@ __pycache__/*
 *.pyc
 Demo/.ipynb_checkpoints/*
 Demo/LHEfiles/*
+Demo/AnalysisZWx.ipynb
