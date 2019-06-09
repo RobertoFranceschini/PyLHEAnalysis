@@ -62,7 +62,8 @@ import lorentz
 
 
 class LHEParticle(object):
-    fieldnames = fieldnames = ['id','status','mother1','mother2','color1','color2','px','py','pz','e','m','lifetime','spin']
+    #fieldnames = fieldnames = ['id','status','mother1','mother2','color1','color2','px','py','pz','e','m','lifetime','spin']
+    fieldnames = ['id','status','mother1','mother2','color1','color2','px','py','pz','e','m','lifetime','spin']
     def __init__(self, **kwargs):
         if not set(kwargs.keys()) == set(self.fieldnames):
             raise RuntimeError
@@ -70,15 +71,21 @@ class LHEParticle(object):
             setattr(self,k,v)
 
     @classmethod
+
+
     def fromstring(cls,string):
         obj = cls(**dict(list(zip(cls.fieldnames,list(map(float,string.split()))))))
         return obj
 
+    def empty(cls,string=13*'NaN '):
+        obj = cls(**dict(list(zip(cls.fieldnames,list(map(float,string.split()))))))
+        return obj
 
     def print_lhe_particle(self):
         for __a in self.fieldnames:
             print( __a, getattr(self,__a) )
         import numpy as np
+        print('phi=',self.fourvector().phi() )
         print('theta=',self.fourvector().theta() )
         print('theta=',np.rad2deg(self.fourvector().theta()), 'deg' )
 
@@ -259,7 +266,7 @@ def splitterLHEevents(list_of_LHEevents): # list of LHEevents usually made of fi
 
 def mergeLHEevents(LHEevent): # list of LHEevents usually made of filtered particle
 
-    if type(LHEevent) is list:
+    if type(LHEevent) is list: # How can it be a list here and then have a particle member later????
         muons=deepcopy(LHEevent)
 
         lv =lorentz.LorentzVector()
@@ -280,11 +287,62 @@ def mergeLHEevents(LHEevent): # list of LHEevents usually made of filtered parti
     else:
         return None
 
+def sumLHEevents(LHEevents, DEBUG=False): # list of LHEevents usually made of filtered particle
+    '''
+    Take a list of events and returns a single event made of a single particle
+    with no PID and four-vector equal to the sum of the particles of the events
+    that have been passed as input
+    '''
+    if type(LHEevents) is list:
+        flat_event=deepcopy(LHEevents[0])
+        p=LHEParticle.fromstring(13*'NaN ')
+        lv =lorentz.LorentzVector()
+        for subev in LHEevents:
+            for muon in subev.particles:
+                _lv=muon.fourvector()
+                if DEBUG: _lv.print_fv()
+                lv=lv+_lv
+
+        p.px = lv.px
+        p.py = lv.py
+        p.pz = lv.pz
+        p.e = lv.e
+
+        flat_event.particles=[p]
+
+        _res = LHEEvent(flat_event.eventinfo, flat_event.particles)
+        return _res
+
+def flattenLHEevents(LHEevents): # list of LHEevents usually made of filtered particle
+    '''
+    Take a list of events and returns a single event made of all the particles
+    '''
+    if type(LHEevents) is list:
+        flat_event=deepcopy(LHEevents[0])
+        p=[]
+        for subev in LHEevents:
+            for muon in subev.particles:
+                p+=[muon]
+
+        flat_event.particles=p
+
+        _res = LHEEvent(flat_event.eventinfo, flat_event.particles)
+        return _res #utils.flattenOnce(_mat) # this is a 1D list of LHEevents, same as the input, hence it can be made an iterative
+
 def identiyLHEevents(list_of_LHEevents): # list of LHEevents usually made of filtered particle
     """
         does not check if the list contains events or not
     """
     if acceptable_shape_at_least_N(list_of_LHEevents,nmin=-1):
+        return list_of_LHEevents
+    else:
+        return None
+
+def passLHEevents(list_of_LHEevents): # list of LHEevents usually made of filtered particle
+    """
+        does not check if the list contains events or not
+    """
+    if type(list_of_LHEevents) is list:
         return list_of_LHEevents
     else:
         return None
