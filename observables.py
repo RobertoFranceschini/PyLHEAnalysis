@@ -14,6 +14,7 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,ret
         obs: the observable. Must be a fuction of a LHE event (from which it reads the list of four-vectors)
 
         list_of_LHEevents: list of LHE events. Each events contains the list of particles on which to compute the observavble
+             they must contain accessory information such as the weight
 
         operation: how to merge the particles contained in each events, e.g. {a,b} , {c,d} |-> {ac,ad,bc,bd}
 
@@ -45,10 +46,22 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,ret
             try: # it is a try because this attribute is not standard of LHE and needs to be set in the analysis
                 _nev=mixed_events[0].eventinfo.event_number
             except IndexError:
+                print('empty set of LHEevents')
+                _nev='event_number'
+                pass
+            except AttributeError:
+                print('missing attribute eventinfo.event_number')
+                _nev='event_number'
                 pass
             try: # it is a try because this attribute is not standard of LHE and needs to be set in the analysis
                 _label=mixed_events[0].eventinfo.sample_label
             except IndexError:
+                print('empty set of LHEevents')
+                _label='sample_label'
+                pass
+            except AttributeError:
+                print('missing attribute eventinfo.sample_label')
+                _label='sample_label'
                 pass
             #[ output.append( {'values':val, 'weight':weight}  ) for val in computed_obs_values ]
             _result = [  {'values':val, 'weight':weight, 'event_number':_nev, 'sample_label':_label }  for val in computed_obs_values ]
@@ -109,6 +122,9 @@ def ThetaFromEta(eta):
 ################################################################################
 
 def phi(lhe_particles):
+    '''
+    lhe_particles is a LHEEvent.particles list
+    '''
     _lv = lorentz.LorentzVector()
     for lv in lhe_particles:
         _lv=lv.fourvector()+_lv
@@ -175,11 +191,7 @@ def SinThetaStar_of2(lhe_particles):
 
 
 
-def invariant_mass(lhe_particles):
-    _lv = lorentz.LorentzVector()
-    for lv in lhe_particles:
-        _lv=lv.fourvector()+_lv
-    return _lv.mass()
+
 
 def missing_invariant_mass_fixed_com(lhe_particles,com=3000):
     _lv = lorentz.LorentzVector()
@@ -209,7 +221,36 @@ def missing_invariant_mass(lhe_particles):
     return missing.signed_mass_squared()
 
 
+def invariant_mass(lhe_particles):
+    '''
+    lhe_particles are LHEEvent.particles made in the function compute_obs_estensively
+    computed_obs_values = [ obs(ev.particles) for ev in mixed_events ]
+    '''
+    _lv = lorentz.LorentzVector()
+    for lv in lhe_particles:
+        _lv=lv.fourvector()+_lv
+    return _lv.mass()
 
+def phi_wrt_ref(part_ref,DEBUG=False):
+    """
+        part_ref are LHEEvent.particles made in the function compute_obs_estensively
+        computed_obs_values = [ obs(ev.particles) for ev in mixed_events ]
+    """
+
+    lhe_ev_part= part_ref[0]
+    lhe_ev_ref= part_ref[1:]
+
+    reference=lorentz.LorentzVector()
+    for r in lhe_ev_ref:
+        reference=reference+r.fourvector()
+    parf_fv=lhe_ev_part.fourvector()
+    print('reference')
+    reference.print_fv()
+    print('vector')
+    parf_fv.print_fv()
+    phi=parf_fv.phi_wrt_reference(reference=reference,second3vector=(0,0,1), DEBUG=False)
+
+    return phi
 
 def s_min(vis_inv):
     """
