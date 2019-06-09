@@ -89,7 +89,10 @@ class LorentzVector(object):
         return np.arccos(self.pz / np.sqrt(self.px**2 + self.py**2 + self.pz**2 ) )
 
     def phi(self):
-        return np.arctan( self.py / self.px  )
+        '''
+        arctan2 from -Pi to +Pi
+        '''
+        return np.arctan2( self.py , self.px  )
 
 
 
