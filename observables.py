@@ -244,10 +244,10 @@ def phi_wrt_ref(part_ref,DEBUG=False):
     for r in lhe_ev_ref:
         reference=reference+r.fourvector()
     parf_fv=lhe_ev_part.fourvector()
-    print('reference')
-    reference.print_fv()
-    print('vector')
-    parf_fv.print_fv()
+    if DEBUG: print('reference')
+    if DEBUG: reference.print_fv()
+    if DEBUG: print('vector')
+    if DEBUG: parf_fv.print_fv()
     phi=parf_fv.phi_wrt_reference(reference=reference,second3vector=(0,0,1), DEBUG=False)
 
     return phi
