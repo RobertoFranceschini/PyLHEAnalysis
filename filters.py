@@ -15,7 +15,10 @@ def filter_by_pid(event=None, pids=[]):
         modified_event = lhef.LHEEvent(ev_info,new_particles)
         return modified_event
 
-def filter_by_function(event=None, function=None, inplace=False,stop_at=None):
+def filter_by_function(event=None, function=None, inplace=False,stop_at=None,DEBUG=False,**kwargs):
+    if DEBUG: print('event ',event)
+    if DEBUG: print('function ',function)
+    if DEBUG: print('inplace ',inplace)
     if event is not None:
         if inplace:
             modified_event = event # reference to object, will affect the original
