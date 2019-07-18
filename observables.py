@@ -167,6 +167,12 @@ def perp(lhe_particles):
         _lv=lv.fourvector()+_lv
     return _lv.perp()
 
+def pL(lhe_particles):
+    _lv = lorentz.LorentzVector()
+    for lv in lhe_particles:
+        _lv=lv.fourvector()+_lv
+    return _lv.pz()
+
 def SinThetaStar_of2(lhe_particles):
     kZ=lhe_particles[0].fourvector()
     kW=lhe_particles[1].fourvector()
