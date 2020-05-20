@@ -129,6 +129,12 @@ class LorentzVector(object):
     def energy(self):
         return self.e
 
+    def pLong(self):
+        return self.pz
+
+    def pL(self):
+        return self.pz
+
     def perp(self):
         return  np.sqrt( ( self.px**2 + self.py**2  ) )
 
