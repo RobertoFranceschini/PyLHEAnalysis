@@ -64,7 +64,10 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,ret
                 _label='sample_label'
                 pass
             #[ output.append( {'values':val, 'weight':weight}  ) for val in computed_obs_values ]
-            _result = [  {'values':val, 'weight':weight, 'event_number':_nev, 'sample_label':_label }  for val in computed_obs_values ]
+            #_result = [  {'values':val, 'weight':weight, 'event_number':_nev, 'sample_label':_label }  for val in computed_obs_values ]
+            _result = [ {** {'values':val, 'weight':weight, 'event_number':_nev, 'sample_label':_label }, **_label}  for val in computed_obs_values ]
+             # merged_dict = {**dict1, **dict2}
+
             if DEBUG: print(_result)
         else: #mixed events was None, weight set to zero
             if DEBUG: print('result should be NaN')
@@ -167,11 +170,17 @@ def perp(lhe_particles):
         _lv=lv.fourvector()+_lv
     return _lv.perp()
 
+def pLong(lhe_particles):
+    _lv = lorentz.LorentzVector()
+    for lv in lhe_particles:
+        _lv=lv.fourvector()+_lv
+    return _lv.pLong()
+
 def pL(lhe_particles):
     _lv = lorentz.LorentzVector()
     for lv in lhe_particles:
         _lv=lv.fourvector()+_lv
-    return _lv.pz
+    return _lv.pL()
 
 def SinThetaStar_of2(lhe_particles):
     kZ=lhe_particles[0].fourvector()
