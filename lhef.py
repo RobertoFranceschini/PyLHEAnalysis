@@ -254,7 +254,10 @@ def acceptable_shape_at_least_N(list_of_LHEevents,nmin=0):
 
 
 def splitterLHEevents(list_of_LHEevents): # list of LHEevents usually made of filtered particle
-
+    '''
+    TOCHECK
+    Take an event containing N>0 particles and returns a list of events with one particle in each event
+    '''
     if acceptable_shape_at_least_N(list_of_LHEevents,nmin=0):
         muons=list_of_LHEevents[0]
 
