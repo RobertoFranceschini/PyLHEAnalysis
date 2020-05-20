@@ -65,7 +65,7 @@ def compute_obs_estensively(obs,list_of_LHEevents,output=None,operation=None,ret
                 pass
             #[ output.append( {'values':val, 'weight':weight}  ) for val in computed_obs_values ]
             #_result = [  {'values':val, 'weight':weight, 'event_number':_nev, 'sample_label':_label }  for val in computed_obs_values ]
-            _result = [ {**{'values':val, 'weight':weight, 'event_number':_nev, 'sample_label':_label }, **_label}  for val in computed_obs_values ]
+            _result = [ {**{'values':val, 'weight':weight, 'event_number':_nev, 'sample_label':_label }, **utils.merge_dicts(*_label['params'] )}  for val in computed_obs_values ]
              # merged_dict = {**dict1, **dict2}
 
             if DEBUG: print(_result)
