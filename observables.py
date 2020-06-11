@@ -174,19 +174,19 @@ def px(lhe_particles):
     _lv = lorentz.LorentzVector()
     for lv in lhe_particles:
         _lv=lv.fourvector()+_lv
-    return _lv.px()
+    return _lv.px
 
 def py(lhe_particles):
     _lv = lorentz.LorentzVector()
     for lv in lhe_particles:
         _lv=lv.fourvector()+_lv
-    return _lv.py()
+    return _lv.py
 
 def pz(lhe_particles):
     _lv = lorentz.LorentzVector()
     for lv in lhe_particles:
         _lv=lv.fourvector()+_lv
-    return _lv.pz()
+    return _lv.pz
 
 def pLong(lhe_particles):
     _lv = lorentz.LorentzVector()
