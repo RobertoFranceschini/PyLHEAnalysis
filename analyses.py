@@ -1,5 +1,6 @@
 import pandas as pd
 import logging
+import time
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO,
