@@ -1,4 +1,15 @@
 import pandas as pd
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("debug.log"),
+        logging.StreamHandler()
+    ]
+)
+#https://stackoverflow.com/questions/15727420/using-logging-in-multiple-modules
 
 class AnalysisResult(object):
     """
@@ -25,10 +36,14 @@ def concatenate_results(list_of_jsons=None,columns=None):
 
 
 def analysis_result_to_pandas(analysis_result=None, names=None):
+
     _Dexclusive=[analysis_result.histograms.list_of_histograms[name].exclusive for name in names ] #list [list of JSON ]
     #_Dinclusive=[analysis_result.histograms.list_of_histograms[name].inclusive for name in names ]
     _D= _Dexclusive #_Dinclusive #_Dexclusive#+_Dinclusive
     #_names_inclusive = [ nam+'_inclusive' for nam in names ]
     _names = names #+_names_inclusive
+    logger.info('Making concatenate_results')
+    start_time = time.time()
     _pd_observables=concatenate_results(list_of_jsons=_D,columns=_names)
+    logger.info("--- %s seconds ---" % (time.time() - start_time))
     return _pd_observables
