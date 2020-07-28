@@ -33,12 +33,27 @@ def concatenate_results(list_of_jsons=None,columns=None):
         start_time = time.time()
         _w=pd.DataFrame( list_of_jsons[0] ).set_index('event_number')['weight'] # DataFrame with the Weight
         logger.info("--- %s seconds ---" % (time.time() - start_time))
-        ####
+        #### breaking up the original procedure
+        #logger.info("Making _dataframed_json=map(lambda x: pd.DataFrame(x).set_index('event_number')['values'], list_of_jsons )")
+        #start_time = time.time() # THIS THE SLOW PART
+        #_dataframed_json=map(lambda x: pd.DataFrame(x).set_index('event_number')['values'], list_of_jsons )
+        #logger.info("--- %s seconds ---" % (time.time() - start_time))
+        #
+        #logger.info("Making _p=pd.concat( _dataframed_json  ,axis=1, sort=False)")
+        #start_time = time.time()
+        #_p=pd.concat( _dataframed_json  ,axis=1, sort=False)
+        #logger.info("--- %s seconds ---" % (time.time() - start_time))
+        #### orignal procedure
         logger.info("Making _p=pd.concat(map(lambda x: pd.DataFrame(x).set_index('event_number')['values'], list_of_jsons ),axis=1, sort=False)")
-        start_time = time.time() # THIS THE SLOW PART
-        _p=pd.concat(map(lambda x: pd.DataFrame(x).set_index('event_number')['values'], list_of_jsons ),axis=1, sort=False)
+        start_time = time.time()
+        _p=pd.concat( map(lambda x: pd.DataFrame(x).set_index('event_number')['values'], list_of_jsons )  ,axis=1, sort=False)
         logger.info("--- %s seconds ---" % (time.time() - start_time))
-        ####
+        #### `from_dict` procedure 3 times slower
+        #logger.info("Making pd.DataFrame.from_records(list_of_jsons, sort=False)")
+        #start_time = time.time()
+        #pd.DataFrame.from_records(list_of_jsons)
+        #logger.info("--- %s seconds ---" % (time.time() - start_time))
+        #
         _p.columns = columns
         logger.info("Making _p=pd.concat([_p,_w],axis=1, sort=False)")
         start_time = time.time()
