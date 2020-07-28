@@ -28,10 +28,19 @@ class AnalysisResult(object):
 
 def concatenate_results(list_of_jsons=None,columns=None):
     if columns is not None:
+        logger.info("Making pd.DataFrame( list_of_jsons[0] ).set_index('event_number')['weight']")
+        start_time = time.time()
         _w=pd.DataFrame( list_of_jsons[0] ).set_index('event_number')['weight'] # DataFrame with the Weight
+        logger.info("--- %s seconds ---" % (time.time() - start_time))
+        logger.info("_p=pd.concat(map(lambda x: pd.DataFrame(x).set_index('event_number')['values'], list_of_jsons ),axis=1, sort=False)")
+        start_time = time.time()
         _p=pd.concat(map(lambda x: pd.DataFrame(x).set_index('event_number')['values'], list_of_jsons ),axis=1, sort=False)
+        logger.info("--- %s seconds ---" % (time.time() - start_time))
         _p.columns = columns
+        logger.info("_p=pd.concat([_p,_w],axis=1, sort=False)")
+        start_time = time.time()
         _p=pd.concat([_p,_w],axis=1, sort=False)
+        logger.info("--- %s seconds ---" % (time.time() - start_time))
     return _p
 
 
