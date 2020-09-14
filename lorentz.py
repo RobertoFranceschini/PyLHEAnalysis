@@ -205,6 +205,7 @@ class LorentzVector(object):
 
             cos = contract_tuples(_beta_u, _reference_u, metric = None)
             if DEBUG:
+                print('*******','costheta_wrt_reference','*******')
                 print('cos',cos,' theta:',np.arccos(cos))
             return cos
         else:
@@ -223,34 +224,40 @@ class LorentzVector(object):
             sin = np.sqrt( contract_tuples(_ort, _ort, metric = None) )
 
             if DEBUG:
+                print('*******','sintheta_wrt_reference','*******')
                 print('sin',sin,' theta:',np.arcsin(sin))
             return sin
         else:
             print('The named paramter *reference* needs to be specified')
             return np.nan()
 
-
-
-    def theta_wrt_referenceY(self,reference=None,second3vector=(0,0,1), DEBUG=False,NewTriadFromLorentzVector=NewTriadYFromLorentzVector):
-        return theta_wrt_reference(self,reference=reference,second3vector=second3vector, DEBUG=DEBUG,NewTriadFromLorentzVector=NewTriadFromLorentzVector)
-
     def theta_wrt_reference(self,reference=None,second3vector=(0,0,1), DEBUG=False,NewTriadFromLorentzVector=NewTriadFromLorentzVector):
         if reference is not None:
             newBasis=reference.NewTriadFromLorentzVector(second3vector=second3vector )
+            print('*******','theta_wrt_reference','*******')
             if DEBUG: print(newBasis['x2prime'])
             if DEBUG: print(newBasis['vectors'])
+            if DEBUG: newreference=reference.Change3DBasis(newBasis['vectors'])
+            if DEBUG: print('newreference')
+            if DEBUG: newreference.print_fv()
+
             newpl=self.Change3DBasis(newBasis['vectors'])
-            return newpl.theta()
+            theta = newpl.theta()
+
+            if DEBUG: print('theta', theta )
+            return theta
         else:
             print('The named paramter *reference* needs to be specified')
             return np.nan()
 
-    def phi_wrt_referenceY(self,reference=None,second3vector=(0,0,1), DEBUG=False,NewTriadFromLorentzVector=NewTriadYFromLorentzVector):
-        return phi_wrt_reference(self,reference=reference,second3vector=second3vector, DEBUG=DEBUG,NewTriadFromLorentzVector=NewTriadFromLorentzVector)
+
+    def theta_wrt_referenceY(self,reference=None,second3vector=(0,0,1), DEBUG=False,NewTriadFromLorentzVector=NewTriadYFromLorentzVector):
+        return self.theta_wrt_reference(reference=reference,second3vector=second3vector, DEBUG=DEBUG,NewTriadFromLorentzVector=NewTriadFromLorentzVector)
 
     def phi_wrt_reference(self,reference=None,second3vector=(0,0,1), DEBUG=False,NewTriadFromLorentzVector=NewTriadFromLorentzVector):
         if reference is not None:
             newBasis=reference.NewTriadFromLorentzVector(second3vector=second3vector )
+            print('*******','phi_wrt_reference','*******')
             if DEBUG: print(newBasis['x2prime'])
             if DEBUG: print(newBasis['vectors'])
             newpl=self.Change3DBasis(newBasis['vectors'])
@@ -263,6 +270,8 @@ class LorentzVector(object):
             print('The named paramter *reference* needs to be specified')
             return np.nan()
 
+    def phi_wrt_referenceY(self,reference=None,second3vector=(0,0,1), DEBUG=False,NewTriadFromLorentzVector=NewTriadYFromLorentzVector):
+        return self.phi_wrt_reference(reference=reference,second3vector=second3vector, DEBUG=DEBUG,NewTriadFromLorentzVector=NewTriadFromLorentzVector)
 
     def Change3DBasis(self,newBasis):
         _self3=self.three_components()
