@@ -264,7 +264,7 @@ def invariant_mass(lhe_particles):
         _lv=lv.fourvector()+_lv
     return _lv.mass()
 
-def phi_wrt_ref(part_ref,DEBUG=False):
+def phi_wrt_ref(part_ref,DEBUG=True):
     """
         part_ref are LHEEvent.particles made in the function compute_obs_estensively
         computed_obs_values = [ obs(ev.particles) for ev in mixed_events ]
@@ -281,9 +281,76 @@ def phi_wrt_ref(part_ref,DEBUG=False):
     if DEBUG: reference.print_fv()
     if DEBUG: print('vector')
     if DEBUG: parf_fv.print_fv()
-    phi=parf_fv.phi_wrt_reference(reference=reference,second3vector=(0,0,1), DEBUG=False)
+    phi=parf_fv.phi_wrt_reference(reference=reference,second3vector=(0,0,1), DEBUG=True)
 
     return phi
+
+
+def phi_wrt_ref_Y(part_ref,DEBUG=True):
+    """
+        part_ref are LHEEvent.particles made in the function compute_obs_estensively
+        computed_obs_values = [ obs(ev.particles) for ev in mixed_events ]
+    """
+
+    lhe_ev_part= part_ref[0]
+    lhe_ev_ref= part_ref[1:]
+
+    reference=lorentz.LorentzVector()
+    for r in lhe_ev_ref:
+        reference=reference+r.fourvector()
+    parf_fv=lhe_ev_part.fourvector()
+    if DEBUG: print('reference')
+    if DEBUG: reference.print_fv()
+    if DEBUG: print('vector')
+    if DEBUG: parf_fv.print_fv()
+    phi=parf_fv.phi_wrt_referenceY(reference=reference,second3vector=(0,0,1), DEBUG=True)
+
+    return phi
+
+
+def theta_wrt_ref_Y(part_ref,DEBUG=True):
+    """
+        part_ref are LHEEvent.particles made in the function compute_obs_estensively
+        computed_obs_values = [ obs(ev.particles) for ev in mixed_events ]
+    """
+
+    lhe_ev_part= part_ref[0]
+    lhe_ev_ref= part_ref[1:]
+
+    reference=lorentz.LorentzVector()
+    for r in lhe_ev_ref:
+        reference=reference+r.fourvector()
+    parf_fv=lhe_ev_part.fourvector()
+    if DEBUG: print('reference')
+    if DEBUG: reference.print_fv()
+    if DEBUG: print('vector')
+    if DEBUG: parf_fv.print_fv()
+    theta=parf_fv.theta_wrt_referenceY(reference=reference,second3vector=(0,0,1), DEBUG=True)
+
+    return theta
+
+def costheta_wrt_ref(part_ref,DEBUG=True):
+    """
+        part_ref are LHEEvent.particles made in the function compute_obs_estensively
+        computed_obs_values = [ obs(ev.particles) for ev in mixed_events ]
+    """
+
+    lhe_ev_part= part_ref[0]
+    lhe_ev_ref= part_ref[1:]
+
+    reference=lorentz.LorentzVector()
+    for r in lhe_ev_ref:
+        reference=reference+r.fourvector()
+    parf_fv=lhe_ev_part.fourvector()
+    if DEBUG: print('reference')
+    if DEBUG: reference.print_fv()
+    if DEBUG: print('vector')
+    if DEBUG: parf_fv.print_fv()
+    theta=parf_fv.costheta_wrt_reference(reference=reference, DEBUG=True) #second3vector=(0,0,1)
+
+    return theta
+
+
 
 def s_min(vis_inv):
     """
